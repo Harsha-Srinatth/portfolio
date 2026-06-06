@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { PROJECTS, type Project } from "./data";
+import { RevealOnScroll } from "./RevealOnScroll";
 
 export function Constellation() {
   const [active, setActive] = useState<Project>(PROJECTS[0]);
@@ -18,7 +19,7 @@ export function Constellation() {
     >
       <SectionLabel index="02" title="Projects" subtitle="Selected builds. Hover to explore." />
 
-      <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-12 px-6 pb-32 md:px-12 lg:grid-cols-12 lg:gap-8 lg:px-20">
+      <RevealOnScroll delay={0.06} className="mx-auto grid max-w-[1600px] grid-cols-1 gap-12 px-6 pb-32 md:px-12 lg:grid-cols-12 lg:gap-8 lg:px-20">
         {/* Map */}
         <div className="relative lg:col-span-7">
           <div className="relative aspect-square w-full overflow-hidden rounded-3xl border border-border bg-card/30 grid-paper">
@@ -170,7 +171,7 @@ export function Constellation() {
             </motion.article>
           </AnimatePresence>
         </div>
-      </div>
+      </RevealOnScroll>
     </section>
   );
 }
@@ -185,18 +186,20 @@ export function SectionLabel({
   subtitle?: string;
 }) {
   return (
-    <div className="mx-auto flex max-w-[1600px] items-end justify-between gap-6 px-6 pt-28 pb-12 md:px-12 lg:px-20">
-      <div className="flex items-end gap-6">
-        <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-primary">
-          §{index}
-        </span>
-        <h2 className="font-display text-4xl md:text-6xl tracking-tight">{title}</h2>
+    <RevealOnScroll>
+      <div className="mx-auto flex max-w-[1600px] items-end justify-between gap-6 px-6 pt-28 pb-12 md:px-12 lg:px-20">
+        <div className="flex items-end gap-6">
+          <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-primary">
+            §{index}
+          </span>
+          <h2 className="font-display text-4xl md:text-6xl tracking-tight">{title}</h2>
+        </div>
+        {subtitle && (
+          <p className="hidden md:block max-w-xs text-right font-mono text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
+            {subtitle}
+          </p>
+        )}
       </div>
-      {subtitle && (
-        <p className="hidden md:block max-w-xs text-right font-mono text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
-          {subtitle}
-        </p>
-      )}
-    </div>
+    </RevealOnScroll>
   );
 }

@@ -1,24 +1,23 @@
 import { useEffect, useRef, useState } from "react";
-import { motion } from "motion/react";
 import { PERSON } from "./data";
+
+function formatLocalTime() {
+  const d = new Date();
+  return (
+    d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) +
+    " UTC" +
+    (-d.getTimezoneOffset() / 60 >= 0 ? "+" : "") +
+    -d.getTimezoneOffset() / 60
+  );
+}
 
 export function Observatory() {
   const ref = useRef<HTMLDivElement>(null);
   const [t, setT] = useState({ x: 0, y: 0 });
-  const [time, setTime] = useState("");
+  const [time, setTime] = useState(formatLocalTime);
 
   useEffect(() => {
-    const update = () => {
-      const d = new Date();
-      setTime(
-        d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) +
-          " UTC" +
-          (-d.getTimezoneOffset() / 60 >= 0 ? "+" : "") +
-          -d.getTimezoneOffset() / 60,
-      );
-    };
-    update();
-    const id = setInterval(update, 1000);
+    const id = setInterval(() => setTime(formatLocalTime()), 1000);
     return () => clearInterval(id);
   }, []);
 
@@ -60,10 +59,8 @@ export function Observatory() {
         <div className="mt-16 grid flex-1 grid-cols-1 gap-16 lg:grid-cols-12 lg:gap-8">
           {/* Name + tagline */}
           <div className="lg:col-span-7 flex flex-col justify-center">
-            <motion.div
-              initial={{ opacity: 0, y: 28 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+            <div
+              className="transition-transform duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
               style={{ transform: `translate3d(${t.x * -10}px, ${t.y * -10}px, 0)` }}
             >
               <p className="font-mono text-xs uppercase tracking-[0.45em] text-primary">
@@ -84,7 +81,7 @@ export function Observatory() {
                 <span className="text-foreground">↓ start drifting</span>
                 <span>or press <kbd className="rounded border border-border px-1.5 py-0.5">K</kbd> for the index</span>
               </div>
-            </motion.div>
+            </div>
           </div>
 
           {/* Specimen plate */}

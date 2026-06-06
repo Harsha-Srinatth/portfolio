@@ -4,6 +4,7 @@ import { FileText } from "lucide-react";
 import { ACHIEVEMENTS } from "./data";
 import { PdfViewer } from "./PdfViewer";
 import { SectionLabel } from "./Constellation";
+import { RevealOnScroll } from "./RevealOnScroll";
 
 function UdemyBadge() {
   return (
@@ -27,7 +28,7 @@ export function Achievements() {
         title="Achievements And Certifications"
         subtitle="What shipped, what moved the needle."
       />
-      <div className="mx-auto max-w-[1600px] px-6 pb-32 md:px-12 lg:px-20">
+      <RevealOnScroll delay={0.06} className="mx-auto max-w-[1600px] px-6 pb-32 md:px-12 lg:px-20">
         <ol className="relative space-y-6 border-l border-border pl-8">
           {ACHIEVEMENTS.map((a, i) => (
             <li key={i} className="relative">
@@ -67,7 +68,7 @@ export function Achievements() {
             </li>
           ))}
         </ol>
-      </div>
+      </RevealOnScroll>
 
       {certificate && (
         <PdfViewer

@@ -4,6 +4,7 @@ import { FileText } from "lucide-react";
 import { PERSON, GITHUB, BEYOND_CODE } from "./data";
 import { ResumeViewer } from "./ResumeViewer";
 import { SectionLabel } from "./Constellation";
+import { RevealOnScroll } from "./RevealOnScroll";
 
 // Deterministic pseudo-random heatmap that sums to 290 across 53 weeks × 7 days.
 function useContributionGrid(total: number) {
@@ -47,7 +48,7 @@ export function About() {
   return (
     <section id="about" className="relative w-full overflow-hidden border-t border-border bg-background">
       <SectionLabel index="01" title="About" subtitle="The basics, on the record." />
-      <div className="mx-auto max-w-[1600px] px-6 pb-32 md:px-12 lg:px-20">
+      <RevealOnScroll delay={0.06} className="mx-auto max-w-[1600px] px-6 pb-32 md:px-12 lg:px-20">
         <div className="max-w-3xl space-y-4 text-pretty text-base leading-relaxed text-muted-foreground md:text-lg">
           {PERSON.about.map((paragraph) => (
             <p key={paragraph.slice(0, 32)}>{paragraph}</p>
@@ -143,7 +144,7 @@ export function About() {
             ))}
           </div>
         </div>
-      </div>
+      </RevealOnScroll>
 
       <ResumeViewer open={resumeOpen} onClose={() => setResumeOpen(false)} />
     </section>

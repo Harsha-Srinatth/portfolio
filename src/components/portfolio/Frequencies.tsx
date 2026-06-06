@@ -1,11 +1,12 @@
 import { FREQUENCIES } from "./data";
 import { SectionLabel } from "./Constellation";
+import { RevealOnScroll } from "./RevealOnScroll";
 
 export function Frequencies() {
   return (
     <section id="frequencies" className="relative w-full overflow-hidden border-t border-border bg-background">
       <SectionLabel index="04" title="Frequencies" subtitle="Skills as radio signals — waves, overlap, and evolution." />
-      <div className="mx-auto max-w-[1600px] px-6 pb-32 md:px-12 lg:px-20">
+      <RevealOnScroll delay={0.06} className="mx-auto max-w-[1600px] px-6 pb-32 md:px-12 lg:px-20">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
           {/* Oscilloscope */}
           <div className="lg:col-span-7 relative aspect-[16/10] overflow-hidden rounded-3xl border border-border bg-card/30 grid-paper">
@@ -77,7 +78,7 @@ export function Frequencies() {
             ))}
           </ul>
         </div>
-      </div>
+      </RevealOnScroll>
     </section>
   );
 }

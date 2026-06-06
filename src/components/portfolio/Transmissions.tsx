@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { PERSON } from "./data";
 import { SectionLabel } from "./Constellation";
+import { RevealOnScroll } from "./RevealOnScroll";
 
 export function Transmissions() {
   const [copied, setCopied] = useState<string | null>(null);
@@ -13,7 +14,7 @@ export function Transmissions() {
   return (
     <section id="transmissions" className="relative w-full overflow-hidden border-t border-border bg-background">
       <SectionLabel index="08" title="Transmissions" subtitle="Open channels. Send something interesting." />
-      <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-12 px-6 pb-32 md:px-12 lg:grid-cols-12 lg:px-20">
+      <RevealOnScroll delay={0.06} className="mx-auto grid max-w-[1600px] grid-cols-1 gap-12 px-6 pb-32 md:px-12 lg:grid-cols-12 lg:px-20">
         {/* Big invitation */}
         <div className="lg:col-span-7">
           <p className="font-display text-[clamp(2rem,5.5vw,5rem)] leading-[0.95] tracking-tight text-balance">
@@ -76,7 +77,7 @@ export function Transmissions() {
             </div>
           </div>
         </aside>
-      </div>
+      </RevealOnScroll>
 
     </section>
   );

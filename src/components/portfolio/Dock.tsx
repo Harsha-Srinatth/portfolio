@@ -5,7 +5,10 @@ const SECTIONS = [
   { id: "index", label: "Index" },
   { id: "about", label: "About" },
   { id: "constellation", label: "Projects" },
+  { id: "strata", label: "Evolution" },
+  { id: "frequencies", label: "Frequencies" },
   { id: "achievements", label: "Achievements & Certifications" },
+  { id: "learning", label: "Learning Vector" },
   { id: "build-log", label: "Build Log" },
   { id: "transmissions", label: "Contact" },
 ];
@@ -14,6 +17,7 @@ export function Dock() {
   const [active, setActive] = useState("index");
 
   useEffect(() => {
+    const observed = new Set<Element>();
     const obs = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
@@ -22,11 +26,26 @@ export function Dock() {
       },
       { rootMargin: "-40% 0px -55% 0px", threshold: 0 },
     );
-    SECTIONS.forEach((s) => {
-      const el = document.getElementById(s.id);
-      if (el) obs.observe(el);
-    });
-    return () => obs.disconnect();
+
+    const observeSections = () => {
+      SECTIONS.forEach((s) => {
+        const el = document.getElementById(s.id);
+        if (el && !observed.has(el)) {
+          obs.observe(el);
+          observed.add(el);
+        }
+      });
+    };
+
+    observeSections();
+    const retry = window.setTimeout(observeSections, 300);
+    const retryAgain = window.setTimeout(observeSections, 1000);
+
+    return () => {
+      window.clearTimeout(retry);
+      window.clearTimeout(retryAgain);
+      obs.disconnect();
+    };
   }, []);
 
   return (
@@ -75,7 +94,7 @@ export function Dock() {
                   {s.label}
                 </span>
                 <span
-                  className="block h-px transition-all"
+                  className="block h-px transition-all duration-300"
                   style={{
                     width: active === s.id ? 28 : 12,
                     background: active === s.id ? "var(--color-primary)" : "var(--color-border)",

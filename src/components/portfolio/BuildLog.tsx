@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BUILD_LOG } from "./data";
 import { SectionLabel } from "./Constellation";
+import { RevealOnScroll } from "./RevealOnScroll";
 
 export function BuildLog() {
   const [active, setActive] = useState(BUILD_LOG[0].month);
@@ -9,7 +10,7 @@ export function BuildLog() {
   return (
     <section id="build-log" className="relative w-full overflow-hidden border-t border-border bg-background">
       <SectionLabel index="07" title="Build Log" subtitle="Engineering journal — challenge → solution → outcome." />
-      <div className="mx-auto max-w-[1600px] px-6 pb-32 md:px-12 lg:px-20">
+      <RevealOnScroll delay={0.06} className="mx-auto max-w-[1600px] px-6 pb-32 md:px-12 lg:px-20">
         <div className="overflow-hidden rounded-3xl border border-border bg-card/40">
           {/* terminal chrome */}
           <div className="flex items-center gap-2 border-b border-border bg-background/50 px-5 py-3">
@@ -60,7 +61,7 @@ export function BuildLog() {
             </div>
           </div>
         </div>
-      </div>
+      </RevealOnScroll>
     </section>
   );
 }

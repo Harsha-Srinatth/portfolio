@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
 
 import { getStats, incrementLike, incrementVisitor } from "@/lib/api/stats.functions";
+import { RevealOnScroll } from "./RevealOnScroll";
 
 function ordinal(n: number) {
   const s = ["th", "st", "nd", "rd"];
@@ -42,7 +43,21 @@ export function SiteFooter() {
       setLiked(localStorage.getItem("rhs.liked") === "1");
     };
 
-    void init();
+    const schedule =
+      typeof window.requestIdleCallback === "function"
+        ? window.requestIdleCallback
+        : (cb: IdleRequestCallback) => window.setTimeout(cb, 1);
+
+    const cancel =
+      typeof window.cancelIdleCallback === "function"
+        ? window.cancelIdleCallback
+        : window.clearTimeout;
+
+    const id = schedule(() => {
+      void init();
+    });
+
+    return () => cancel(id);
   }, []);
 
   const toggleHeart = async () => {
@@ -58,7 +73,7 @@ export function SiteFooter() {
 
   return (
     <footer className="relative w-full border-t border-border bg-background">
-      <div className="mx-auto max-w-[1600px] px-6 py-16 md:px-12 lg:px-20">
+      <RevealOnScroll className="mx-auto max-w-[1600px] px-6 py-16 md:px-12 lg:px-20">
         {/* Impressed? */}
         <div className="grid grid-cols-1 gap-10 md:grid-cols-[1fr_auto] md:items-center">
           <div>
@@ -125,7 +140,7 @@ export function SiteFooter() {
             <span>© 2026 Ryali Harsha Srinatth · built by hand</span>
           </div>
         </div>
-      </div>
+      </RevealOnScroll>
     </footer>
   );
 }

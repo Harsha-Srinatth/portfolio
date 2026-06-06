@@ -1,17 +1,18 @@
 import { STRATA } from "./data";
 import { SectionLabel } from "./Constellation";
+import { RevealOnScroll } from "./RevealOnScroll";
 
 export function Stratum() {
   return (
     <section id="strata" className="relative w-full overflow-hidden border-t border-border bg-background">
       <SectionLabel index="03" title="Evolution" subtitle="Knowledge accumulated through curiosity and building." />
-      <div className="mx-auto max-w-[1600px] px-6 pb-32 md:px-12 lg:px-20">
+      <RevealOnScroll delay={0.06} className="mx-auto max-w-[1600px] px-6 pb-32 md:px-12 lg:px-20">
         <div className="overflow-hidden rounded-3xl border border-border">
           {STRATA.map((s, i) => (
             <Layer key={s.era} s={s} i={i} total={STRATA.length} />
           ))}
         </div>
-      </div>
+      </RevealOnScroll>
     </section>
   );
 }
