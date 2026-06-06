@@ -26,18 +26,32 @@ export function SiteFooter() {
         localStorage.setItem("rhs.stats.version", "2");
       }
 
-      const stats = await getStats();
-      setHearts(stats.likes);
+      let stats = { visitors: 0, likes: 0 };
+
+      try {
+        stats = await getStats();
+        setHearts(stats.likes);
+      } catch {
+        const storedHearts = parseInt(localStorage.getItem("rhs.hearts") ?? "0", 10);
+        setHearts(storedHearts);
+      }
 
       const seen = localStorage.getItem("rhs.visited");
       if (!seen) {
-        const updated = await incrementVisitor();
-        localStorage.setItem("rhs.visited", "1");
-        localStorage.setItem("rhs.visitor.number", String(updated.visitors));
-        setVisitor(updated.visitors);
+        try {
+          const updated = await incrementVisitor();
+          localStorage.setItem("rhs.visited", "1");
+          localStorage.setItem("rhs.visitor.number", String(updated.visitors));
+          setVisitor(updated.visitors);
+        } catch {
+          const fallback = stats.visitors + 1;
+          localStorage.setItem("rhs.visited", "1");
+          localStorage.setItem("rhs.visitor.number", String(fallback));
+          setVisitor(fallback);
+        }
       } else {
         const stored = parseInt(localStorage.getItem("rhs.visitor.number") ?? "0", 10);
-        setVisitor(stored || stats.visitors);
+        setVisitor(stored || stats.visitors || 1);
       }
 
       setLiked(localStorage.getItem("rhs.liked") === "1");
@@ -63,8 +77,18 @@ export function SiteFooter() {
   const toggleHeart = async () => {
     if (liked) return;
 
-    const updated = await incrementLike();
-    setHearts(updated.likes);
+    try {
+      const updated = await incrementLike();
+      setHearts(updated.likes);
+      localStorage.setItem("rhs.hearts", String(updated.likes));
+    } catch {
+      setHearts((count) => {
+        const next = count + 1;
+        localStorage.setItem("rhs.hearts", String(next));
+        return next;
+      });
+    }
+
     setLiked(true);
     setBurst(true);
     localStorage.setItem("rhs.liked", "1");

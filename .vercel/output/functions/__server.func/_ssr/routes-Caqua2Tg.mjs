@@ -1,10 +1,10 @@
 import { o as __toESM } from "../_runtime.mjs";
 import { n as require_jsx_runtime, r as require_react } from "../_libs/react+tanstack__react-query.mjs";
-import { t as getServerFnById } from "../__23tanstack-start-server-fn-resolver-BvbcuWH4.mjs";
+import { t as getServerFnById } from "../__23tanstack-start-server-fn-resolver-Den6Dy88.mjs";
 import { i as TSS_SERVER_FUNCTION, l as createServerFn } from "./esm-LNPJ6T5I.mjs";
 import { i as Download, n as Heart, r as FileText, t as X } from "../_libs/lucide-react.mjs";
 import { n as motion, r as AnimatePresence, t as useReducedMotion } from "../_libs/framer-motion.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/routes-hHnmUk7l.js
+//#region node_modules/.nitro/vite/services/ssr/assets/routes-Caqua2Tg.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 function Cursor() {
@@ -1906,14 +1906,28 @@ function SiteFooter() {
 				localStorage.removeItem("rhs.liked");
 				localStorage.setItem("rhs.stats.version", "2");
 			}
-			const stats = await getStats();
-			setHearts(stats.likes);
-			if (!localStorage.getItem("rhs.visited")) {
+			let stats = {
+				visitors: 0,
+				likes: 0
+			};
+			try {
+				stats = await getStats();
+				setHearts(stats.likes);
+			} catch {
+				setHearts(parseInt(localStorage.getItem("rhs.hearts") ?? "0", 10));
+			}
+			if (!localStorage.getItem("rhs.visited")) try {
 				const updated = await incrementVisitor();
 				localStorage.setItem("rhs.visited", "1");
 				localStorage.setItem("rhs.visitor.number", String(updated.visitors));
 				setVisitor(updated.visitors);
-			} else setVisitor(parseInt(localStorage.getItem("rhs.visitor.number") ?? "0", 10) || stats.visitors);
+			} catch {
+				const fallback = stats.visitors + 1;
+				localStorage.setItem("rhs.visited", "1");
+				localStorage.setItem("rhs.visitor.number", String(fallback));
+				setVisitor(fallback);
+			}
+			else setVisitor(parseInt(localStorage.getItem("rhs.visitor.number") ?? "0", 10) || stats.visitors || 1);
 			setLiked(localStorage.getItem("rhs.liked") === "1");
 		};
 		const schedule = typeof window.requestIdleCallback === "function" ? window.requestIdleCallback : (cb) => window.setTimeout(cb, 1);
@@ -1925,7 +1939,17 @@ function SiteFooter() {
 	}, []);
 	const toggleHeart = async () => {
 		if (liked) return;
-		setHearts((await incrementLike()).likes);
+		try {
+			const updated = await incrementLike();
+			setHearts(updated.likes);
+			localStorage.setItem("rhs.hearts", String(updated.likes));
+		} catch {
+			setHearts((count) => {
+				const next = count + 1;
+				localStorage.setItem("rhs.hearts", String(next));
+				return next;
+			});
+		}
 		setLiked(true);
 		setBurst(true);
 		localStorage.setItem("rhs.liked", "1");

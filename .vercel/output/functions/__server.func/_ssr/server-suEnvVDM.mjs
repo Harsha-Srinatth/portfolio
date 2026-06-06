@@ -3,7 +3,7 @@ import { n as require_jsx_runtime, r as require_react } from "../_libs/react+tan
 import { A as isNotFound, C as resolveManifestAssetLink, D as isResolvedRedirect, E as isRedirect, M as invariant, S as getStylesheetHref, T as executeRewriteInput, a as replaceSsrResponse, i as normalizeSsrResponse, k as rootRouteId, l as RouterProvider, n as defineHandlerCallback, o as stripSsrResponseBody, r as isSsrResponse, t as renderRouterToStream, w as resolveManifestCssLink, x as getScriptPreloadAttrs } from "../_libs/@tanstack/react-router+[...].mjs";
 import { n as createMemoryHistory } from "../_libs/tanstack__history.mjs";
 import { d as su, i as mergeHeaders, l as Pu, n as getNormalizedURL, o as createRawStreamRPCPlugin, r as getOrigin, s as createSerializationAdapter, t as attachRouterServerSsrUtils, u as iu } from "../_libs/@tanstack/router-core+[...].mjs";
-import { t as getServerFnById } from "../__23tanstack-start-server-fn-resolver-BvbcuWH4.mjs";
+import { t as getServerFnById } from "../__23tanstack-start-server-fn-resolver-Den6Dy88.mjs";
 import { a as X_TSS_RAW_RESPONSE, c as createNullProtoObject, d as getDefaultSerovalPlugins, f as getStartContext, i as TSS_SERVER_FUNCTION, m as safeObjectMerge, n as TSS_CONTENT_TYPE_FRAMED_VERSIONED, o as X_TSS_SERIALIZED, p as runWithStartContext, r as TSS_FORMDATA_CONTEXT, s as createCsrfMiddleware, t as FrameType, u as flattenMiddlewares } from "./esm-LNPJ6T5I.mjs";
 import { n as toResponse, t as H3Event } from "../_libs/h3-v2.mjs";
 import { AsyncLocalStorage } from "node:async_hooks";
@@ -82,7 +82,7 @@ var HEADERS = { TSS_SHELL: "X-TSS_SHELL" };
 * the dev styles URL for route-scoped CSS collection.
 */
 async function getStartManifest(matchedRoutes) {
-	const { tsrStartManifest } = await import("../_tanstack-start-manifest_v-Yztm1iCO.mjs");
+	const { tsrStartManifest } = await import("../_tanstack-start-manifest_v-B1t1Fv9s.mjs");
 	const startManifest = tsrStartManifest();
 	let routes = startManifest.routes;
 	routes[rootRouteId];
@@ -1022,7 +1022,7 @@ var getBaseManifest = getProdBaseManifest;
 var createEarlyHintsForRequest = createEarlyHintsCollector;
 async function loadEntries() {
 	const [routerEntry, startEntry, pluginAdapters] = await Promise.all([
-		import("./router-DMX-HiIB.mjs"),
+		import("./router-CAqVd7EU.mjs"),
 		import("./start-ObTnauo7.mjs"),
 		import("./empty-plugin-adapters-D9UWiqvJ.mjs")
 	]);
