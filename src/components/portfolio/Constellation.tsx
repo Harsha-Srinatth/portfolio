@@ -186,20 +186,18 @@ export function SectionLabel({
   subtitle?: string;
 }) {
   return (
-    <RevealOnScroll>
-      <div className="mx-auto flex max-w-[1600px] items-end justify-between gap-6 px-6 pt-28 pb-12 md:px-12 lg:px-20">
-        <div className="flex items-end gap-6">
-          <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-primary">
-            §{index}
-          </span>
-          <h2 className="font-display text-4xl md:text-6xl tracking-tight">{title}</h2>
-        </div>
-        {subtitle && (
-          <p className="hidden md:block max-w-xs text-right font-mono text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
-            {subtitle}
-          </p>
-        )}
+    <div className="mx-auto flex max-w-[1600px] items-end justify-between gap-6 px-6 pt-28 pb-12 md:px-12 lg:px-20">
+      <div className="flex items-end gap-6">
+        <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-primary">
+          §{index}
+        </span>
+        <h2 className="font-display text-4xl md:text-6xl tracking-tight">{title}</h2>
       </div>
-    </RevealOnScroll>
+      {subtitle && (
+        <p className="hidden md:block max-w-xs text-right font-mono text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
+          {subtitle}
+        </p>
+      )}
+    </div>
   );
 }

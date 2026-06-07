@@ -114,7 +114,9 @@ function Channel({
         <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
           {label}
         </div>
-        <div className="mt-1 font-display text-xl tracking-tight">{value}</div>
+        <div className="mt-2 font-mono text-base leading-snug tracking-[0.04em] text-foreground md:text-lg">
+          {value}
+        </div>
       </div>
       <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-primary opacity-0 transition-opacity group-hover:opacity-100">
         {isCopied ? "copied ✓" : "copy ↵"}

@@ -149,7 +149,6 @@
     font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
     overflow-x: hidden;
     cursor: none;
-    text-rendering: optimizeLegibility;
   }
 
   html, body { height: 100%; }
