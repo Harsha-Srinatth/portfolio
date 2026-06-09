@@ -2,7 +2,7 @@ import { o as __toESM } from "../_runtime.mjs";
 import { n as require_jsx_runtime, r as require_react } from "../_libs/react+tanstack__react-query.mjs";
 import { i as Download, n as Heart, r as FileText, t as X } from "../_libs/lucide-react.mjs";
 import { n as motion, r as AnimatePresence, t as useReducedMotion } from "../_libs/framer-motion.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/routes-DhA0m924.js
+//#region node_modules/.nitro/vite/services/ssr/assets/routes-DCyI30rs.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 function Cursor() {
@@ -387,6 +387,7 @@ var PROJECTS = [
 		title: "Personal Notes & Bookmark Manager",
 		year: "2025",
 		kind: "Full-Stack Productivity",
+		url: "https://note-vault-green.vercel.app",
 		blurb: "A full-stack personal productivity app for managing notes and bookmarks with secure authentication, smart search, tagging, and an animated modern UI.",
 		detail: "Production-style monorepo built with Next.js, Express, and MongoDB. JWT-secured accounts with per-user data isolation. Full CRUD on notes and bookmarks, server-side search and tag filtering, and automatic bookmark title fetching via Axios and Cheerio metadata scraping. MongoDB indexes optimize text and compound queries. Responsive UI with Framer Motion, modals, tag chips, and glassmorphism navigation.",
 		signal: .89,
@@ -412,7 +413,7 @@ var PROJECTS = [
 		title: "HabitIQ",
 		year: "2025",
 		kind: "Predictive Intelligence System",
-		url: "https://studyhabit-backend.onrender.com",
+		url: "https://study-habit-backend-oerf.vercel.app",
 		blurb: "A full-stack machine learning product that predicts student study outcomes from daily behavioral signals and delivers actionable, personalized coaching in real time.",
 		detail: "End-to-end ML platform with a React 19 six-step intake wizard collecting 14 behavioral features — sleep, study time, environment, motivation, and technique. A tuned RandomForestClassifier (200 estimators) is served through a FastAPI inference API with Pydantic validation and ColumnTransformer preprocessing (OneHot, StandardScaler, Ordinal). Stateless microservice deployed on Render with joblib-serialized artifacts and tier-based coaching recommendations on the frontend.",
 		signal: .92,
@@ -463,6 +464,7 @@ var PROJECTS = [
 		title: "Verve",
 		year: "2025",
 		kind: "Campus Engagement System",
+		url: "https://my-frontend-kohl.vercel.app",
 		blurb: "A campus-wide social ecosystem designed to transform student participation into a connected digital experience for clubs, sports, culture, and peer communities.",
 		detail: "MERN-stack platform enabling clubs, cultural organizations, sports teams, and learners to share updates, build communities, and foster collaboration. JWT authentication and authorization, post creation with likes and comments, follow/follower graph, profile management, and community discovery — all backed by a RESTful API architecture built for secure, scalable campus engagement.",
 		signal: .84,

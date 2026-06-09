@@ -5,10 +5,10 @@ import { t as QueryClient } from "../_libs/tanstack__query-core.mjs";
 import { t as Redis2 } from "../_libs/uncrypto+upstash__redis.mjs";
 import path from "node:path";
 import fs from "node:fs/promises";
-//#region node_modules/.nitro/vite/services/ssr/assets/router-HWW80D5h.js
+//#region node_modules/.nitro/vite/services/ssr/assets/router-qZ201IeW.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
-var styles_default = "/assets/styles-7ZECHGnY.css";
+var styles_default = "/assets/styles-DOZkyoXH.css";
 function reportLovableError(error, context = {}) {
 	if (typeof window === "undefined") return;
 	window.__lovableEvents?.captureException?.(error, {
@@ -127,25 +127,10 @@ var Route$2 = createRootRouteWithContext()({
 				content: "@Lovable"
 			}
 		],
-		links: [
-			{
-				rel: "stylesheet",
-				href: styles_default
-			},
-			{
-				rel: "preconnect",
-				href: "https://fonts.googleapis.com"
-			},
-			{
-				rel: "preconnect",
-				href: "https://fonts.gstatic.com",
-				crossOrigin: "anonymous"
-			},
-			{
-				rel: "stylesheet",
-				href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-			}
-		]
+		links: [{
+			rel: "stylesheet",
+			href: styles_default
+		}]
 	}),
 	shellComponent: RootShell,
 	component: RootComponent,
@@ -165,7 +150,7 @@ function RootComponent() {
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Outlet, {})
 	});
 }
-var $$splitComponentImporter = () => import("./routes-DhA0m924.mjs");
+var $$splitComponentImporter = () => import("./routes-DCyI30rs.mjs");
 var Route$1 = createFileRoute("/")({
 	head: () => ({ meta: [
 		{ title: "Ryali Harsha Srinatth — Full-Stack Engineer" },
