@@ -3,13 +3,13 @@ import path from "node:path";
 
 import { Redis } from "@upstash/redis";
 
-type PortfolioStats = {
+export type PortfolioStats = {
   visitors: number;
   likes: number;
 };
 
-const VISITORS_KEY = "portfolio:visitors";
-const LIKES_KEY = "portfolio:likes";
+const VISITORS_KEY = "visitors";
+const LIKES_KEY = "likes";
 const STATS_FILE = path.join(process.cwd(), ".data", "portfolio-stats.json");
 
 const defaultStats = (): PortfolioStats => ({
@@ -18,10 +18,21 @@ const defaultStats = (): PortfolioStats => ({
 });
 
 function getRedis(): Redis | null {
-  const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
+  const url =
+    process.env.UPSTASH_REDIS_REST_URL ??
+    process.env.KV_REST_API_URL ??
+    process.env.STORAGE_UPSTASH_REDIS_REST_URL;
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN ??
+    process.env.KV_REST_API_TOKEN ??
+    process.env.STORAGE_UPSTASH_REDIS_REST_TOKEN;
   if (!url || !token) return null;
+
   return new Redis({ url, token });
+}
+
+function isProduction() {
+  return process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
 }
 
 async function readStatsFromRedis(redis: Redis): Promise<PortfolioStats> {
@@ -56,15 +67,23 @@ async function readStats(): Promise<PortfolioStats> {
   return readStatsFromFile();
 }
 
-export async function getPortfolioStats() {
+export async function getPortfolioStats(): Promise<PortfolioStats> {
   return readStats();
 }
 
-export async function incrementPortfolioVisitors() {
+export async function incrementPortfolioVisitors(): Promise<PortfolioStats> {
   const redis = getRedis();
   if (redis) {
-    await redis.incr(VISITORS_KEY);
-    return readStatsFromRedis(redis);
+    const visitors = await redis.incr(VISITORS_KEY);
+    const likes = Number(await redis.get(LIKES_KEY)) || 0;
+    return { visitors, likes };
+  }
+
+  if (isProduction()) {
+    console.error(
+      "[stats] Upstash Redis is not configured. Add UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Vercel.",
+    );
+    return defaultStats();
   }
 
   const stats = await readStatsFromFile();
@@ -73,11 +92,19 @@ export async function incrementPortfolioVisitors() {
   return stats;
 }
 
-export async function incrementPortfolioLikes() {
+export async function incrementPortfolioLikes(): Promise<PortfolioStats> {
   const redis = getRedis();
   if (redis) {
-    await redis.incr(LIKES_KEY);
-    return readStatsFromRedis(redis);
+    const likes = await redis.incr(LIKES_KEY);
+    const visitors = Number(await redis.get(VISITORS_KEY)) || 0;
+    return { visitors, likes };
+  }
+
+  if (isProduction()) {
+    console.error(
+      "[stats] Upstash Redis is not configured. Add UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Vercel.",
+    );
+    return defaultStats();
   }
 
   const stats = await readStatsFromFile();

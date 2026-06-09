@@ -1,10 +1,8 @@
 import { o as __toESM } from "../_runtime.mjs";
 import { n as require_jsx_runtime, r as require_react } from "../_libs/react+tanstack__react-query.mjs";
-import { t as getServerFnById } from "../__23tanstack-start-server-fn-resolver-BvbcuWH4.mjs";
-import { i as TSS_SERVER_FUNCTION, l as createServerFn } from "./esm-LNPJ6T5I.mjs";
 import { i as Download, n as Heart, r as FileText, t as X } from "../_libs/lucide-react.mjs";
 import { n as motion, r as AnimatePresence, t as useReducedMotion } from "../_libs/framer-motion.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/routes-hHnmUk7l.js
+//#region node_modules/.nitro/vite/services/ssr/assets/routes-BzZ0zzH7.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 function Cursor() {
@@ -1158,7 +1156,7 @@ function Constellation() {
 	});
 }
 function SectionLabel({ index, title, subtitle }) {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RevealOnScroll, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "mx-auto flex max-w-[1600px] items-end justify-between gap-6 px-6 pt-28 pb-12 md:px-12 lg:px-20",
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 			className: "flex items-end gap-6",
@@ -1173,7 +1171,7 @@ function SectionLabel({ index, title, subtitle }) {
 			className: "hidden md:block max-w-xs text-right font-mono text-[11px] uppercase tracking-[0.3em] text-muted-foreground",
 			children: subtitle
 		})]
-	}) });
+	});
 }
 function useContributionGrid(total) {
 	return (0, import_react.useMemo)(() => {
@@ -1859,7 +1857,7 @@ function Channel({ label, value, copied, onCopy }) {
 			className: "font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground",
 			children: label
 		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			className: "mt-1 font-display text-xl tracking-tight",
+			className: "mt-2 font-mono text-base leading-snug tracking-[0.04em] text-foreground md:text-lg",
 			children: value
 		})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 			className: "font-mono text-[10px] uppercase tracking-[0.3em] text-primary opacity-0 transition-opacity group-hover:opacity-100",
@@ -1867,21 +1865,41 @@ function Channel({ label, value, copied, onCopy }) {
 		})]
 	});
 }
-var createSsrRpc = (functionId) => {
-	const url = "/_serverFn/" + functionId;
-	const serverFnMeta = { id: functionId };
-	const fn = async (...args) => {
-		return (await getServerFnById(functionId, { origin: "server" }))(...args);
-	};
-	return Object.assign(fn, {
-		url,
-		serverFnMeta,
-		[TSS_SERVER_FUNCTION]: true
-	});
-};
-var getStats = createServerFn({ method: "GET" }).handler(createSsrRpc("1db1af4e539abe2b72416e116ff3a506da34e0ac6655ce979ab7e52d52f751b8"));
-var incrementVisitor = createServerFn({ method: "POST" }).handler(createSsrRpc("a01a6f3a6228a5c03b362eb89334e7545766d5df25cf6d1f7fd31c1d680b31e8"));
-var incrementLike = createServerFn({ method: "POST" }).handler(createSsrRpc("eecd12f427c473579cac927043f72cb208403bdf0df663eaa711a269e2afd7d5"));
+async function parseStatsResponse(res) {
+	if (!res.ok) throw new Error(`Stats request failed (${res.status})`);
+	return await res.json();
+}
+async function fetchStats() {
+	return parseStatsResponse(await fetch("/api/stats", {
+		method: "GET",
+		headers: { accept: "application/json" },
+		cache: "no-store"
+	}));
+}
+async function recordVisitor() {
+	return parseStatsResponse(await fetch("/api/stats", {
+		method: "POST",
+		headers: {
+			"content-type": "application/json",
+			accept: "application/json"
+		},
+		body: JSON.stringify({ action: "visitor" })
+	}));
+}
+async function recordLike() {
+	return parseStatsResponse(await fetch("/api/stats", {
+		method: "POST",
+		headers: {
+			"content-type": "application/json",
+			accept: "application/json"
+		},
+		body: JSON.stringify({ action: "like" })
+	}));
+}
+var VISITED_KEY = "rhs.visited";
+var LIKED_KEY = "rhs.liked";
+var STATS_VERSION_KEY = "rhs.stats.version";
+var STATS_VERSION = "3";
 function ordinal(n) {
 	const s = [
 		"th",
@@ -1899,36 +1917,42 @@ function SiteFooter() {
 	const [burst, setBurst] = (0, import_react.useState)(false);
 	(0, import_react.useEffect)(() => {
 		const init = async () => {
-			if (localStorage.getItem("rhs.stats.version") !== "2") {
-				localStorage.removeItem("rhs.visited");
-				localStorage.removeItem("rhs.visitor.number");
-				localStorage.removeItem("rhs.hearts");
-				localStorage.removeItem("rhs.liked");
-				localStorage.setItem("rhs.stats.version", "2");
+			if (localStorage.getItem(STATS_VERSION_KEY) !== STATS_VERSION) {
+				localStorage.removeItem(VISITED_KEY);
+				localStorage.removeItem(LIKED_KEY);
+				localStorage.setItem(STATS_VERSION_KEY, STATS_VERSION);
 			}
-			const stats = await getStats();
-			setHearts(stats.likes);
-			if (!localStorage.getItem("rhs.visited")) {
-				const updated = await incrementVisitor();
-				localStorage.setItem("rhs.visited", "1");
-				localStorage.setItem("rhs.visitor.number", String(updated.visitors));
-				setVisitor(updated.visitors);
-			} else setVisitor(parseInt(localStorage.getItem("rhs.visitor.number") ?? "0", 10) || stats.visitors);
-			setLiked(localStorage.getItem("rhs.liked") === "1");
+			setLiked(localStorage.getItem(LIKED_KEY) === "1");
+			const alreadyVisited = localStorage.getItem(VISITED_KEY) === "1";
+			try {
+				if (!alreadyVisited) {
+					const updated = await recordVisitor();
+					localStorage.setItem(VISITED_KEY, "1");
+					setVisitor(updated.visitors);
+					setHearts(updated.likes);
+					return;
+				}
+				const stats = await fetchStats();
+				setVisitor(stats.visitors);
+				setHearts(stats.likes);
+			} catch (error) {
+				console.error("[stats] Failed to load portfolio counters", error);
+				setVisitor(null);
+			}
 		};
-		const schedule = typeof window.requestIdleCallback === "function" ? window.requestIdleCallback : (cb) => window.setTimeout(cb, 1);
-		const cancel = typeof window.cancelIdleCallback === "function" ? window.cancelIdleCallback : window.clearTimeout;
-		const id = schedule(() => {
-			init();
-		});
-		return () => cancel(id);
+		init();
 	}, []);
 	const toggleHeart = async () => {
 		if (liked) return;
-		setHearts((await incrementLike()).likes);
+		try {
+			setHearts((await recordLike()).likes);
+		} catch (error) {
+			console.error("[stats] Failed to record like", error);
+			setHearts((count) => count + 1);
+		}
 		setLiked(true);
 		setBurst(true);
-		localStorage.setItem("rhs.liked", "1");
+		localStorage.setItem(LIKED_KEY, "1");
 		setTimeout(() => setBurst(false), 700);
 	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("footer", {

@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
 
-import { getStats, incrementLike, incrementVisitor } from "@/lib/api/stats.functions";
+import { fetchStats, recordLike, recordVisitor } from "@/lib/api/stats-api";
 import { RevealOnScroll } from "./RevealOnScroll";
+
+const VISITED_KEY = "rhs.visited";
+const LIKED_KEY = "rhs.liked";
+const STATS_VERSION_KEY = "rhs.stats.version";
+const STATS_VERSION = "3";
 
 function ordinal(n: number) {
   const s = ["th", "st", "nd", "rd"];
@@ -18,80 +23,51 @@ export function SiteFooter() {
 
   useEffect(() => {
     const init = async () => {
-      if (localStorage.getItem("rhs.stats.version") !== "2") {
-        localStorage.removeItem("rhs.visited");
-        localStorage.removeItem("rhs.visitor.number");
-        localStorage.removeItem("rhs.hearts");
-        localStorage.removeItem("rhs.liked");
-        localStorage.setItem("rhs.stats.version", "2");
+      if (localStorage.getItem(STATS_VERSION_KEY) !== STATS_VERSION) {
+        localStorage.removeItem(VISITED_KEY);
+        localStorage.removeItem(LIKED_KEY);
+        localStorage.setItem(STATS_VERSION_KEY, STATS_VERSION);
       }
 
-      let stats = { visitors: 0, likes: 0 };
+      setLiked(localStorage.getItem(LIKED_KEY) === "1");
+
+      const alreadyVisited = localStorage.getItem(VISITED_KEY) === "1";
 
       try {
-        stats = await getStats();
-        setHearts(stats.likes);
-      } catch {
-        const storedHearts = parseInt(localStorage.getItem("rhs.hearts") ?? "0", 10);
-        setHearts(storedHearts);
-      }
-
-      const seen = localStorage.getItem("rhs.visited");
-      if (!seen) {
-        try {
-          const updated = await incrementVisitor();
-          localStorage.setItem("rhs.visited", "1");
-          localStorage.setItem("rhs.visitor.number", String(updated.visitors));
+        if (!alreadyVisited) {
+          const updated = await recordVisitor();
+          localStorage.setItem(VISITED_KEY, "1");
           setVisitor(updated.visitors);
-        } catch {
-          const fallback = stats.visitors + 1;
-          localStorage.setItem("rhs.visited", "1");
-          localStorage.setItem("rhs.visitor.number", String(fallback));
-          setVisitor(fallback);
+          setHearts(updated.likes);
+          return;
         }
-      } else {
-        const stored = parseInt(localStorage.getItem("rhs.visitor.number") ?? "0", 10);
-        setVisitor(stored || stats.visitors || 1);
-      }
 
-      setLiked(localStorage.getItem("rhs.liked") === "1");
+        const stats = await fetchStats();
+        setVisitor(stats.visitors);
+        setHearts(stats.likes);
+      } catch (error) {
+        console.error("[stats] Failed to load portfolio counters", error);
+        setVisitor(null);
+      }
     };
 
-    const schedule =
-      typeof window.requestIdleCallback === "function"
-        ? window.requestIdleCallback
-        : (cb: IdleRequestCallback) => window.setTimeout(cb, 1);
-
-    const cancel =
-      typeof window.cancelIdleCallback === "function"
-        ? window.cancelIdleCallback
-        : window.clearTimeout;
-
-    const id = schedule(() => {
-      void init();
-    });
-
-    return () => cancel(id);
+    void init();
   }, []);
 
   const toggleHeart = async () => {
     if (liked) return;
 
     try {
-      const updated = await incrementLike();
+      const updated = await recordLike();
       setHearts(updated.likes);
-      localStorage.setItem("rhs.hearts", String(updated.likes));
-    } catch {
-      setHearts((count) => {
-        const next = count + 1;
-        localStorage.setItem("rhs.hearts", String(next));
-        return next;
-      });
+    } catch (error) {
+      console.error("[stats] Failed to record like", error);
+      setHearts((count) => count + 1);
     }
 
     setLiked(true);
     setBurst(true);
-    localStorage.setItem("rhs.liked", "1");
+    localStorage.setItem(LIKED_KEY, "1");
     setTimeout(() => setBurst(false), 700);
   };
 

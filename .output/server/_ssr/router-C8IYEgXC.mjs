@@ -2,10 +2,13 @@ import { o as __toESM } from "../_runtime.mjs";
 import { n as require_jsx_runtime, r as require_react, t as QueryClientProvider } from "../_libs/react+tanstack__react-query.mjs";
 import { c as HeadContent, d as Outlet, f as lazyRouteComponent, g as useRouter, h as Link, m as createRootRouteWithContext, p as createFileRoute, s as Scripts, u as createRouter } from "../_libs/@tanstack/react-router+[...].mjs";
 import { t as QueryClient } from "../_libs/tanstack__query-core.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/router-DMX-HiIB.js
+import { t as Redis2 } from "../_libs/uncrypto+upstash__redis.mjs";
+import path from "node:path";
+import fs from "node:fs/promises";
+//#region node_modules/.nitro/vite/services/ssr/assets/router-C8IYEgXC.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
-var styles_default = "/assets/styles-wNs98bMI.css";
+var styles_default = "/assets/styles-7ZECHGnY.css";
 function reportLovableError(error, context = {}) {
 	if (typeof window === "undefined") return;
 	window.__lovableEvents?.captureException?.(error, {
@@ -86,7 +89,7 @@ function ErrorComponent({ error, reset }) {
 		})
 	});
 }
-var Route$1 = createRootRouteWithContext()({
+var Route$2 = createRootRouteWithContext()({
 	head: () => ({
 		meta: [
 			{ charSet: "utf-8" },
@@ -140,7 +143,7 @@ var Route$1 = createRootRouteWithContext()({
 			},
 			{
 				rel: "stylesheet",
-				href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+				href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
 			}
 		]
 	}),
@@ -156,14 +159,14 @@ function RootShell({ children }) {
 	});
 }
 function RootComponent() {
-	const { queryClient } = Route$1.useRouteContext();
+	const { queryClient } = Route$2.useRouteContext();
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(QueryClientProvider, {
 		client: queryClient,
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Outlet, {})
 	});
 }
-var $$splitComponentImporter = () => import("./routes-hHnmUk7l.mjs");
-var rootRouteChildren = { IndexRoute: createFileRoute("/")({
+var $$splitComponentImporter = () => import("./routes-BzZ0zzH7.mjs");
+var Route$1 = createFileRoute("/")({
 	head: () => ({ meta: [
 		{ title: "Ryali Harsha Srinatth — Full-Stack Engineer" },
 		{
@@ -180,12 +183,126 @@ var rootRouteChildren = { IndexRoute: createFileRoute("/")({
 		}
 	] }),
 	component: lazyRouteComponent($$splitComponentImporter, "component")
-}).update({
-	id: "/",
-	path: "/",
-	getParentRoute: () => Route$1
-}) };
-var routeTree = Route$1._addFileChildren(rootRouteChildren)._addFileTypes();
+});
+var VISITORS_KEY = "visitors";
+var LIKES_KEY = "likes";
+var STATS_FILE = path.join(process.cwd(), ".data", "portfolio-stats.json");
+var defaultStats = () => ({
+	visitors: 0,
+	likes: 0
+});
+function getRedis() {
+	const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
+	const token = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
+	if (!url || !token) return null;
+	return new Redis2({
+		url,
+		token
+	});
+}
+function isProduction() {
+	return true;
+}
+async function readStatsFromRedis(redis) {
+	const [visitors, likes] = await redis.mget(VISITORS_KEY, LIKES_KEY);
+	return {
+		visitors: Number(visitors) || 0,
+		likes: Number(likes) || 0
+	};
+}
+async function readStatsFromFile() {
+	try {
+		const raw = await fs.readFile(STATS_FILE, "utf-8");
+		const parsed = JSON.parse(raw);
+		return {
+			visitors: Number(parsed.visitors) || 0,
+			likes: Number(parsed.likes) || 0
+		};
+	} catch {
+		return defaultStats();
+	}
+}
+async function writeStatsToFile(stats) {
+	await fs.mkdir(path.dirname(STATS_FILE), { recursive: true });
+	await fs.writeFile(STATS_FILE, JSON.stringify(stats, null, 2), "utf-8");
+}
+async function readStats() {
+	const redis = getRedis();
+	if (redis) return readStatsFromRedis(redis);
+	return readStatsFromFile();
+}
+async function getPortfolioStats() {
+	return readStats();
+}
+async function incrementPortfolioVisitors() {
+	const redis = getRedis();
+	if (redis) return {
+		visitors: await redis.incr(VISITORS_KEY),
+		likes: Number(await redis.get(LIKES_KEY)) || 0
+	};
+	if (isProduction()) {
+		console.error("[stats] Upstash Redis is not configured. Add UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Vercel.");
+		return defaultStats();
+	}
+	const stats = await readStatsFromFile();
+	stats.visitors += 1;
+	await writeStatsToFile(stats);
+	return stats;
+}
+async function incrementPortfolioLikes() {
+	const redis = getRedis();
+	if (redis) {
+		const likes = await redis.incr(LIKES_KEY);
+		return {
+			visitors: Number(await redis.get(VISITORS_KEY)) || 0,
+			likes
+		};
+	}
+	if (isProduction()) {
+		console.error("[stats] Upstash Redis is not configured. Add UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Vercel.");
+		return defaultStats();
+	}
+	const stats = await readStatsFromFile();
+	stats.likes += 1;
+	await writeStatsToFile(stats);
+	return stats;
+}
+var Route = createFileRoute("/api/stats")({ server: { handlers: {
+	GET: async () => {
+		const stats = await getPortfolioStats();
+		return Response.json(stats, { headers: { "cache-control": "no-store" } });
+	},
+	POST: async ({ request }) => {
+		let action;
+		try {
+			action = (await request.json()).action;
+		} catch {
+			return Response.json({ error: "Invalid JSON body" }, { status: 400 });
+		}
+		if (action === "visitor") {
+			const stats = await incrementPortfolioVisitors();
+			return Response.json(stats);
+		}
+		if (action === "like") {
+			const stats = await incrementPortfolioLikes();
+			return Response.json(stats);
+		}
+		return Response.json({ error: "Unknown action" }, { status: 400 });
+	}
+} } });
+var rootRouteChildren = {
+	IndexRoute: Route$1.update({
+		id: "/",
+		path: "/",
+		getParentRoute: () => Route$2
+	}),
+	ApiStatsRoute: Route.update({
+		id: "/api/stats",
+		path: "/api/stats",
+		getParentRoute: () => Route$2
+	})
+};
+var routeTree = Route$2._addFileChildren(rootRouteChildren)._addFileTypes();
 var getRouter = () => {
 	return createRouter({
 		routeTree,
