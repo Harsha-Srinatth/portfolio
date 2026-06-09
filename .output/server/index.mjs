@@ -30,33 +30,26 @@ var public_assets_data_default = {
 		"size": 5031,
 		"path": "../public/icons.svg"
 	},
-	"/assets/index-CzO2F5ey.js": {
+	"/assets/routes-BDm6TYuG.js": {
 		"type": "text/javascript; charset=utf-8",
-		"etag": "\"54323-GSdITWVibCsW2CVHp30WCuDcNm8\"",
-		"mtime": "2026-06-09T08:27:51.494Z",
-		"size": 344867,
-		"path": "../public/assets/index-CzO2F5ey.js"
-	},
-	"/assets/routes-D7Q4ynWq.js": {
-		"type": "text/javascript; charset=utf-8",
-		"etag": "\"2b891-rBkIDRaurD+VyVb3QJcK/H5O8O4\"",
-		"mtime": "2026-06-09T08:27:51.494Z",
-		"size": 178321,
-		"path": "../public/assets/routes-D7Q4ynWq.js"
+		"etag": "\"2bc19-UntF/uD7lybgulru6PlVI39RgwE\"",
+		"mtime": "2026-06-09T09:35:42.267Z",
+		"size": 179225,
+		"path": "../public/assets/routes-BDm6TYuG.js"
 	},
 	"/assets/styles-7ZECHGnY.css": {
 		"type": "text/css; charset=utf-8",
 		"etag": "\"17413-RYzcVNXL1ZLlefM00YmcsBnxyuc\"",
-		"mtime": "2026-06-09T08:27:51.495Z",
+		"mtime": "2026-06-09T09:35:42.268Z",
 		"size": 95251,
 		"path": "../public/assets/styles-7ZECHGnY.css"
 	},
-	"/harsha_res.pdf": {
-		"type": "application/pdf",
-		"etag": "\"f39b-gkYitz6OY4zQNESn/d2mSoxQglQ\"",
-		"mtime": "2026-05-30T15:45:23.340Z",
-		"size": 62363,
-		"path": "../public/harsha_res.pdf"
+	"/assets/index-DqtcWJak.js": {
+		"type": "text/javascript; charset=utf-8",
+		"etag": "\"54323-YwCunmTAIbbejn/eCpppcEsLZ5o\"",
+		"mtime": "2026-06-09T09:35:42.265Z",
+		"size": 344867,
+		"path": "../public/assets/index-DqtcWJak.js"
 	},
 	"/favicon.svg": {
 		"type": "image/svg+xml",
@@ -71,6 +64,13 @@ var public_assets_data_default = {
 		"mtime": "2026-06-05T05:51:57.322Z",
 		"size": 242208,
 		"path": "../public/Udemy-Ml-Certificate-Harsha.pdf"
+	},
+	"/harsha_res.pdf": {
+		"type": "application/pdf",
+		"etag": "\"f39b-gkYitz6OY4zQNESn/d2mSoxQglQ\"",
+		"mtime": "2026-05-30T15:45:23.340Z",
+		"size": 62363,
+		"path": "../public/harsha_res.pdf"
 	}
 };
 //#endregion

@@ -2,7 +2,7 @@ import { o as __toESM } from "../_runtime.mjs";
 import { n as require_jsx_runtime, r as require_react } from "../_libs/react+tanstack__react-query.mjs";
 import { i as Download, n as Heart, r as FileText, t as X } from "../_libs/lucide-react.mjs";
 import { n as motion, r as AnimatePresence, t as useReducedMotion } from "../_libs/framer-motion.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/routes-BzZ0zzH7.js
+//#region node_modules/.nitro/vite/services/ssr/assets/routes-DhA0m924.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 function Cursor() {
@@ -382,127 +382,103 @@ var PROJECTS = [
 		]
 	},
 	{
-		id: "tideline",
-		codename: "TDL-04",
-		title: "Tideline",
-		year: "2024",
-		kind: "Climate Sonification",
-		blurb: "Twenty years of Atlantic tide data, performed nightly as a string quartet.",
-		detail: "Tideline ingests NOAA buoy archives, fits each station to a harmonic basis, and renders the residuals — what the model failed to predict — as a chamber piece. It has played at Pier 5 every full moon since 2024.",
-		signal: .71,
+		id: "notes-bookmarks",
+		codename: "NBK-02",
+		title: "Personal Notes & Bookmark Manager",
+		year: "2025",
+		kind: "Full-Stack Productivity",
+		blurb: "A full-stack personal productivity app for managing notes and bookmarks with secure authentication, smart search, tagging, and an animated modern UI.",
+		detail: "Production-style monorepo built with Next.js, Express, and MongoDB. JWT-secured accounts with per-user data isolation. Full CRUD on notes and bookmarks, server-side search and tag filtering, and automatic bookmark title fetching via Axios and Cheerio metadata scraping. MongoDB indexes optimize text and compound queries. Responsive UI with Framer Motion, modals, tag chips, and glassmorphism navigation.",
+		signal: .89,
 		hue: 198,
 		metrics: [
 			{
-				label: "Stations",
-				value: "182"
+				label: "API",
+				value: "12 REST endpoints"
 			},
 			{
-				label: "Hours played",
-				value: "3,902"
+				label: "Models",
+				value: "User · Note · Bookmark"
 			},
 			{
-				label: "Audience",
-				value: "Mostly seabirds"
+				label: "Stack",
+				value: "Next.js · Express · MongoDB"
 			}
 		]
 	},
 	{
-		id: "marginalia",
-		codename: "MRG-09",
-		title: "Marginalia",
-		year: "2024",
-		kind: "Reading Instrument",
-		blurb: "A second cursor for your books that reads beside you and argues politely.",
-		detail: "An e-ink companion that pairs with any EPUB. It underlines what you skim, asks one question per chapter, and refuses to answer questions you have not earned. Closed beta; 1,400 readers; one minor schism.",
-		signal: .83,
+		id: "habitiq",
+		codename: "HIQ-03",
+		title: "HabitIQ",
+		year: "2025",
+		kind: "Predictive Intelligence System",
+		url: "https://studyhabit-backend.onrender.com",
+		blurb: "A full-stack machine learning product that predicts student study outcomes from daily behavioral signals and delivers actionable, personalized coaching in real time.",
+		detail: "End-to-end ML platform with a React 19 six-step intake wizard collecting 14 behavioral features — sleep, study time, environment, motivation, and technique. A tuned RandomForestClassifier (200 estimators) is served through a FastAPI inference API with Pydantic validation and ColumnTransformer preprocessing (OneHot, StandardScaler, Ordinal). Stateless microservice deployed on Render with joblib-serialized artifacts and tier-based coaching recommendations on the frontend.",
+		signal: .92,
 		hue: 312,
 		metrics: [
 			{
-				label: "Annotations",
-				value: "412k"
+				label: "Features",
+				value: "14 behavioral inputs"
 			},
 			{
-				label: "Books finished",
-				value: "+38%"
+				label: "ML",
+				value: "Random Forest · 200 trees"
 			},
 			{
-				label: "Returns",
-				value: "0"
+				label: "Deploy",
+				value: "FastAPI on Render"
 			}
 		]
 	},
 	{
-		id: "fold",
-		codename: "FLD-02",
-		title: "Fold",
-		year: "2023",
-		kind: "Origami CAD",
-		blurb: "CAD software that designs the crease pattern by watching you crumple paper.",
-		detail: "Fold tracks paper deformation through a single camera, solves for the dual graph, and proposes a flat-foldable pattern that approximates your intent. Used by two aerospace teams and one extremely patient pastry chef.",
-		signal: .65,
+		id: "agrisense",
+		codename: "AGR-04",
+		title: "AgriSense AI",
+		year: "2025",
+		kind: "AgriTech · Generative AI",
+		blurb: "An AI-powered, multilingual farming companion that turns soil, weather, and crop images into actionable recommendations farmers can read or hear.",
+		detail: "Full-stack AgriTech platform for Indian farmers combining React 19 with a modular Flask backend powered by Google Gemini 2.5 Flash. Four AI workflows: crop recommendation, vision-based disease detection, pre-planting risk analysis, and fertilizer guidance. Four-language i18n (English, Hindi, Telugu, Tamil), Web Speech API audio playback, geolocation and WeatherAPI auto-fill, explainable AI panels, and progressive multi-step forms — designed for low-literacy, field-ready use.",
+		signal: .87,
 		hue: 145,
 		metrics: [
 			{
-				label: "Crease accuracy",
-				value: "0.6mm"
+				label: "AI modules",
+				value: "4 workflows"
 			},
 			{
-				label: "Patterns shipped",
-				value: "1,109"
+				label: "Languages",
+				value: "EN · HI · TE · TA"
 			},
 			{
-				label: "Paper wasted",
-				value: "Reasonable"
+				label: "API",
+				value: "4 REST endpoints"
 			}
 		]
 	},
 	{
-		id: "nocturne",
-		codename: "NCT-07",
-		title: "Nocturne",
-		year: "2023",
-		kind: "Offline-first OS shell",
-		blurb: "A desktop environment that refuses to connect to the internet between 10pm and 6am.",
-		detail: "Nocturne is a window manager and notification mediator built around circadian boundaries. Networking is hard-suspended at the kernel level overnight; emergencies require a passphrase your past-self chose.",
-		signal: .88,
+		id: "verve",
+		codename: "VRV-05",
+		title: "Verve",
+		year: "2025",
+		kind: "Campus Engagement System",
+		blurb: "A campus-wide social ecosystem designed to transform student participation into a connected digital experience for clubs, sports, culture, and peer communities.",
+		detail: "MERN-stack platform enabling clubs, cultural organizations, sports teams, and learners to share updates, build communities, and foster collaboration. JWT authentication and authorization, post creation with likes and comments, follow/follower graph, profile management, and community discovery — all backed by a RESTful API architecture built for secure, scalable campus engagement.",
+		signal: .84,
 		hue: 268,
 		metrics: [
 			{
-				label: "Sleep recovered",
-				value: "47min / night"
+				label: "Communities",
+				value: "Clubs · Sports · Culture"
 			},
 			{
-				label: "Installs",
-				value: "9,210"
+				label: "Engagement",
+				value: "Posts · Likes · Comments"
 			},
 			{
-				label: "Apologies received",
-				value: "Many"
-			}
-		]
-	},
-	{
-		id: "verdigris",
-		codename: "VRD-11",
-		title: "Verdigris",
-		year: "2022",
-		kind: "Material Memory",
-		blurb: "An archive of every patina on every public sculpture in three cities, updated weekly.",
-		detail: "Verdigris uses citizen-submitted photographs and a custom spectral model to map oxidation over time on bronze monuments. It is, accidentally, also a record of which statues people stop touching.",
-		signal: .58,
-		hue: 168,
-		metrics: [
-			{
-				label: "Sculptures",
-				value: "2,841"
-			},
-			{
-				label: "Submissions",
-				value: "61k"
-			},
-			{
-				label: "Cities",
-				value: "3 — for now"
+				label: "Stack",
+				value: "React · Node · MongoDB · JWT"
 			}
 		]
 	}
@@ -582,11 +558,10 @@ var FREQUENCIES = [
 ];
 var SIGNALS = [
 	"00:14 · college360x broadcast a placement readiness tier update campus-wide",
-	"07:42 · tideline picked up a chord nobody wrote",
-	"12:03 · marginalia disagreed with itself in 4 languages",
-	"16:21 · fold solved a crease pattern in 11 steps; the pastry chef approved",
-	"19:55 · nocturne refused a calendar invite. politely.",
-	"23:08 · verdigris recorded the first frost on a bronze hand"
+	"07:42 · notes-bookmarks auto-fetched 12 bookmark titles overnight",
+	"12:03 · habitiq scored a study session from 14 behavioral signals",
+	"16:21 · agrisense diagnosed crop disease from a field photo in Telugu",
+	"19:55 · verve connected three campus clubs in one engagement feed"
 ];
 function formatLocalTime() {
 	const d = /* @__PURE__ */ new Date();

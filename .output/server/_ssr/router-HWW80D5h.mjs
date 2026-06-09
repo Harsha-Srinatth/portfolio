@@ -5,7 +5,7 @@ import { t as QueryClient } from "../_libs/tanstack__query-core.mjs";
 import { t as Redis2 } from "../_libs/uncrypto+upstash__redis.mjs";
 import path from "node:path";
 import fs from "node:fs/promises";
-//#region node_modules/.nitro/vite/services/ssr/assets/router-C8IYEgXC.js
+//#region node_modules/.nitro/vite/services/ssr/assets/router-HWW80D5h.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var styles_default = "/assets/styles-7ZECHGnY.css";
@@ -165,7 +165,7 @@ function RootComponent() {
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Outlet, {})
 	});
 }
-var $$splitComponentImporter = () => import("./routes-BzZ0zzH7.mjs");
+var $$splitComponentImporter = () => import("./routes-DhA0m924.mjs");
 var Route$1 = createFileRoute("/")({
 	head: () => ({ meta: [
 		{ title: "Ryali Harsha Srinatth — Full-Stack Engineer" },
@@ -192,8 +192,8 @@ var defaultStats = () => ({
 	likes: 0
 });
 function getRedis() {
-	const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
-	const token = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
+	const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL ?? process.env.STORAGE_UPSTASH_REDIS_REST_URL;
+	const token = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN ?? process.env.STORAGE_UPSTASH_REDIS_REST_TOKEN;
 	if (!url || !token) return null;
 	return new Redis2({
 		url,
