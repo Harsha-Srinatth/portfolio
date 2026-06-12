@@ -1,5 +1,5 @@
 export type PortfolioStats = {
-  visitors: number;
+  currentCount: number;
   likes: number;
 };
 
@@ -19,11 +19,11 @@ export async function fetchStats(): Promise<PortfolioStats> {
   return parseStatsResponse(res);
 }
 
-export async function recordVisitor(): Promise<PortfolioStats> {
+export async function recordOpen(): Promise<PortfolioStats> {
   const res = await fetch("/api/stats", {
     method: "POST",
     headers: { "content-type": "application/json", accept: "application/json" },
-    body: JSON.stringify({ action: "visitor" }),
+    body: JSON.stringify({ action: "open" }),
   });
   return parseStatsResponse(res);
 }

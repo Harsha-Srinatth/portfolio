@@ -4,16 +4,17 @@ import path from "node:path";
 import { Redis } from "@upstash/redis";
 
 export type PortfolioStats = {
-  visitors: number;
+  currentCount: number;
   likes: number;
 };
 
-const VISITORS_KEY = "visitors";
-const LIKES_KEY = "likes";
+// v2 keys — fresh counters (old `visitors` / `likes` keys are no longer used)
+const CURRENT_COUNT_KEY = "rhs:current-count";
+const LIKES_KEY = "rhs:likes";
 const STATS_FILE = path.join(process.cwd(), ".data", "portfolio-stats.json");
 
 const defaultStats = (): PortfolioStats => ({
-  visitors: 0,
+  currentCount: 0,
   likes: 0,
 });
 
@@ -36,9 +37,9 @@ function isProduction() {
 }
 
 async function readStatsFromRedis(redis: Redis): Promise<PortfolioStats> {
-  const [visitors, likes] = await redis.mget<number>(VISITORS_KEY, LIKES_KEY);
+  const [currentCount, likes] = await redis.mget<number>(CURRENT_COUNT_KEY, LIKES_KEY);
   return {
-    visitors: Number(visitors) || 0,
+    currentCount: Number(currentCount) || 0,
     likes: Number(likes) || 0,
   };
 }
@@ -48,7 +49,7 @@ async function readStatsFromFile(): Promise<PortfolioStats> {
     const raw = await fs.readFile(STATS_FILE, "utf-8");
     const parsed = JSON.parse(raw) as Partial<PortfolioStats>;
     return {
-      visitors: Number(parsed.visitors) || 0,
+      currentCount: Number(parsed.currentCount) || 0,
       likes: Number(parsed.likes) || 0,
     };
   } catch {
@@ -61,33 +62,29 @@ async function writeStatsToFile(stats: PortfolioStats) {
   await fs.writeFile(STATS_FILE, JSON.stringify(stats, null, 2), "utf-8");
 }
 
-async function readStats(): Promise<PortfolioStats> {
+export async function getPortfolioStats(): Promise<PortfolioStats> {
   const redis = getRedis();
   if (redis) return readStatsFromRedis(redis);
   return readStatsFromFile();
 }
 
-export async function getPortfolioStats(): Promise<PortfolioStats> {
-  return readStats();
-}
-
-export async function incrementPortfolioVisitors(): Promise<PortfolioStats> {
+export async function incrementCurrentCount(): Promise<PortfolioStats> {
   const redis = getRedis();
   if (redis) {
-    const visitors = await redis.incr(VISITORS_KEY);
+    const currentCount = await redis.incr(CURRENT_COUNT_KEY);
     const likes = Number(await redis.get(LIKES_KEY)) || 0;
-    return { visitors, likes };
+    return { currentCount, likes };
   }
 
   if (isProduction()) {
     console.error(
-      "[stats] Upstash Redis is not configured. Add UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Vercel.",
+      "[stats] Upstash Redis is not configured. Add KV_REST_API_URL and KV_REST_API_TOKEN in Vercel.",
     );
     return defaultStats();
   }
 
   const stats = await readStatsFromFile();
-  stats.visitors += 1;
+  stats.currentCount += 1;
   await writeStatsToFile(stats);
   return stats;
 }
@@ -96,13 +93,13 @@ export async function incrementPortfolioLikes(): Promise<PortfolioStats> {
   const redis = getRedis();
   if (redis) {
     const likes = await redis.incr(LIKES_KEY);
-    const visitors = Number(await redis.get(VISITORS_KEY)) || 0;
-    return { visitors, likes };
+    const currentCount = Number(await redis.get(CURRENT_COUNT_KEY)) || 0;
+    return { currentCount, likes };
   }
 
   if (isProduction()) {
     console.error(
-      "[stats] Upstash Redis is not configured. Add UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Vercel.",
+      "[stats] Upstash Redis is not configured. Add KV_REST_API_URL and KV_REST_API_TOKEN in Vercel.",
     );
     return defaultStats();
   }

@@ -2,8 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import {
   getPortfolioStats,
+  incrementCurrentCount,
   incrementPortfolioLikes,
-  incrementPortfolioVisitors,
 } from "@/lib/stats.server";
 
 export const Route = createFileRoute("/api/stats")({
@@ -25,8 +25,8 @@ export const Route = createFileRoute("/api/stats")({
           return Response.json({ error: "Invalid JSON body" }, { status: 400 });
         }
 
-        if (action === "visitor") {
-          const stats = await incrementPortfolioVisitors();
+        if (action === "open") {
+          const stats = await incrementCurrentCount();
           return Response.json(stats);
         }
 

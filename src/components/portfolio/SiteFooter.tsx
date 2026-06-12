@@ -1,15 +1,21 @@
 import { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
 
-import { recordLike, recordVisitor } from "@/lib/api/stats-api";
+import { recordLike, recordOpen } from "@/lib/api/stats-api";
 import { RevealOnScroll } from "./RevealOnScroll";
+
+function ordinal(n: number) {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] ?? s[v] ?? s[0]);
+}
 
 const LIKED_KEY = "rhs.liked";
 const STATS_VERSION_KEY = "rhs.stats.version";
-const STATS_VERSION = "4";
+const STATS_VERSION = "5";
 
 export function SiteFooter() {
-  const [visitor, setVisitor] = useState<number | null>(null);
+  const [currentCount, setCurrentCount] = useState<number | null>(null);
   const [hearts, setHearts] = useState(0);
   const [liked, setLiked] = useState(false);
   const [burst, setBurst] = useState(false);
@@ -19,6 +25,7 @@ export function SiteFooter() {
       if (localStorage.getItem(STATS_VERSION_KEY) !== STATS_VERSION) {
         localStorage.removeItem("rhs.visited");
         localStorage.removeItem("rhs.visitor.number");
+        localStorage.removeItem("rhs.hearts");
         localStorage.removeItem(LIKED_KEY);
         localStorage.setItem(STATS_VERSION_KEY, STATS_VERSION);
       }
@@ -26,12 +33,12 @@ export function SiteFooter() {
       setLiked(localStorage.getItem(LIKED_KEY) === "1");
 
       try {
-        const updated = await recordVisitor();
-        setVisitor(updated.visitors);
+        const updated = await recordOpen();
+        setCurrentCount(updated.currentCount);
         setHearts(updated.likes);
       } catch (error) {
         console.error("[stats] Failed to load portfolio counters", error);
-        setVisitor(null);
+        setCurrentCount(null);
       }
     };
 
@@ -114,10 +121,11 @@ export function SiteFooter() {
           </div>
           <div className="flex flex-wrap items-center gap-6">
             <span>
-              Total visits{" "}
+              You are the{" "}
               <span className="text-foreground">
-                {visitor !== null ? visitor.toLocaleString() : "—"}
-              </span>
+                {currentCount !== null ? ordinal(currentCount) : "—"}
+              </span>{" "}
+              visitor
             </span>
             <span className="h-1.5 w-1.5 rounded-full bg-primary anim-glow" />
             <span>© 2026 Ryali Harsha Srinatth · built by hand</span>
