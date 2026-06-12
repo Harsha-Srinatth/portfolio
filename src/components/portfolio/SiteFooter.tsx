@@ -1,19 +1,12 @@
 import { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
 
-import { fetchStats, recordLike, recordVisitor } from "@/lib/api/stats-api";
+import { recordLike, recordVisitor } from "@/lib/api/stats-api";
 import { RevealOnScroll } from "./RevealOnScroll";
 
-const VISITED_KEY = "rhs.visited";
 const LIKED_KEY = "rhs.liked";
 const STATS_VERSION_KEY = "rhs.stats.version";
-const STATS_VERSION = "3";
-
-function ordinal(n: number) {
-  const s = ["th", "st", "nd", "rd"];
-  const v = n % 100;
-  return n + (s[(v - 20) % 10] ?? s[v] ?? s[0]);
-}
+const STATS_VERSION = "4";
 
 export function SiteFooter() {
   const [visitor, setVisitor] = useState<number | null>(null);
@@ -24,27 +17,18 @@ export function SiteFooter() {
   useEffect(() => {
     const init = async () => {
       if (localStorage.getItem(STATS_VERSION_KEY) !== STATS_VERSION) {
-        localStorage.removeItem(VISITED_KEY);
+        localStorage.removeItem("rhs.visited");
+        localStorage.removeItem("rhs.visitor.number");
         localStorage.removeItem(LIKED_KEY);
         localStorage.setItem(STATS_VERSION_KEY, STATS_VERSION);
       }
 
       setLiked(localStorage.getItem(LIKED_KEY) === "1");
 
-      const alreadyVisited = localStorage.getItem(VISITED_KEY) === "1";
-
       try {
-        if (!alreadyVisited) {
-          const updated = await recordVisitor();
-          localStorage.setItem(VISITED_KEY, "1");
-          setVisitor(updated.visitors);
-          setHearts(updated.likes);
-          return;
-        }
-
-        const stats = await fetchStats();
-        setVisitor(stats.visitors);
-        setHearts(stats.likes);
+        const updated = await recordVisitor();
+        setVisitor(updated.visitors);
+        setHearts(updated.likes);
       } catch (error) {
         console.error("[stats] Failed to load portfolio counters", error);
         setVisitor(null);
@@ -130,11 +114,10 @@ export function SiteFooter() {
           </div>
           <div className="flex flex-wrap items-center gap-6">
             <span>
-              You are the{" "}
+              Total visits{" "}
               <span className="text-foreground">
-                {visitor !== null ? ordinal(visitor) : "—"}
-              </span>{" "}
-              visitor
+                {visitor !== null ? visitor.toLocaleString() : "—"}
+              </span>
             </span>
             <span className="h-1.5 w-1.5 rounded-full bg-primary anim-glow" />
             <span>© 2026 Ryali Harsha Srinatth · built by hand</span>
