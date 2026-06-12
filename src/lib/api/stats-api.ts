@@ -24,6 +24,7 @@ export async function recordOpen(): Promise<PortfolioStats> {
     method: "POST",
     headers: { "content-type": "application/json", accept: "application/json" },
     body: JSON.stringify({ action: "open" }),
+    cache: "no-store",
   });
   return parseStatsResponse(res);
 }
@@ -33,6 +34,7 @@ export async function recordLike(): Promise<PortfolioStats> {
     method: "POST",
     headers: { "content-type": "application/json", accept: "application/json" },
     body: JSON.stringify({ action: "like" }),
+    cache: "no-store",
   });
   return parseStatsResponse(res);
 }

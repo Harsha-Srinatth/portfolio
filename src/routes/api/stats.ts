@@ -27,12 +27,16 @@ export const Route = createFileRoute("/api/stats")({
 
         if (action === "open") {
           const stats = await incrementCurrentCount();
-          return Response.json(stats);
+          return Response.json(stats, {
+            headers: { "cache-control": "no-store" },
+          });
         }
 
         if (action === "like") {
           const stats = await incrementPortfolioLikes();
-          return Response.json(stats);
+          return Response.json(stats, {
+            headers: { "cache-control": "no-store" },
+          });
         }
 
         return Response.json({ error: "Unknown action" }, { status: 400 });

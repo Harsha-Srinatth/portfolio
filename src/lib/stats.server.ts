@@ -77,10 +77,9 @@ export async function incrementCurrentCount(): Promise<PortfolioStats> {
   }
 
   if (isProduction()) {
-    console.error(
+    throw new Error(
       "[stats] Upstash Redis is not configured. Add KV_REST_API_URL and KV_REST_API_TOKEN in Vercel.",
     );
-    return defaultStats();
   }
 
   const stats = await readStatsFromFile();
@@ -98,10 +97,9 @@ export async function incrementPortfolioLikes(): Promise<PortfolioStats> {
   }
 
   if (isProduction()) {
-    console.error(
+    throw new Error(
       "[stats] Upstash Redis is not configured. Add KV_REST_API_URL and KV_REST_API_TOKEN in Vercel.",
     );
-    return defaultStats();
   }
 
   const stats = await readStatsFromFile();

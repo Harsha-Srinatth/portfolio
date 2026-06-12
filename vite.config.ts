@@ -22,7 +22,9 @@ export default defineConfig({
   },
   plugins: [
     tanstackStart(),
-    nitro(),
+    nitro({
+      preset: process.env.VERCEL ? "vercel" : "node-server",
+    }),
     tailwindcss(),
     react(),
   ],

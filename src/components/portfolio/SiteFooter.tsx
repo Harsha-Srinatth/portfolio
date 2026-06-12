@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
 
-import { recordLike, recordOpen } from "@/lib/api/stats-api";
+import { incrementLike, incrementOpen } from "@/lib/api/stats.functions";
 import { RevealOnScroll } from "./RevealOnScroll";
 
 function ordinal(n: number) {
@@ -12,7 +12,7 @@ function ordinal(n: number) {
 
 const LIKED_KEY = "rhs.liked";
 const STATS_VERSION_KEY = "rhs.stats.version";
-const STATS_VERSION = "5";
+const STATS_VERSION = "6";
 
 export function SiteFooter() {
   const [currentCount, setCurrentCount] = useState<number | null>(null);
@@ -33,7 +33,7 @@ export function SiteFooter() {
       setLiked(localStorage.getItem(LIKED_KEY) === "1");
 
       try {
-        const updated = await recordOpen();
+        const updated = await incrementOpen();
         setCurrentCount(updated.currentCount);
         setHearts(updated.likes);
       } catch (error) {
@@ -49,7 +49,7 @@ export function SiteFooter() {
     if (liked) return;
 
     try {
-      const updated = await recordLike();
+      const updated = await incrementLike();
       setHearts(updated.likes);
     } catch (error) {
       console.error("[stats] Failed to record like", error);
