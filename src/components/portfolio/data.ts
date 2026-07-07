@@ -321,5 +321,3 @@ export const SIGNALS = [
   "16:21 · agrisense diagnosed crop disease from a field photo in Telugu",
   "19:55 · verve connected three campus clubs in one engagement feed",
 ];
-
-//  #harsha-srinatth-ryali

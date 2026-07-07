@@ -11,7 +11,9 @@ node_modules
 dist
 dist-ssr
 .output
+.output/**
 .vercel
+.vercel/**
 *.local
 .data
 
