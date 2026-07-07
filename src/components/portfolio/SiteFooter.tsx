@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
 
-import { incrementLike, incrementOpen } from "@/lib/api/stats.functions";
+import { incrementLike } from "@/lib/api/stats.functions";
 import { RevealOnScroll } from "./RevealOnScroll";
 
 function ordinal(n: number) {
@@ -11,38 +11,19 @@ function ordinal(n: number) {
 }
 
 const LIKED_KEY = "rhs.liked";
-const STATS_VERSION_KEY = "rhs.stats.version";
-const STATS_VERSION = "6";
 
-export function SiteFooter() {
-  const [currentCount, setCurrentCount] = useState<number | null>(null);
-  const [hearts, setHearts] = useState(0);
+type SiteFooterProps = {
+  visitorCount: number | null;
+  hearts: number;
+  onHeartsChange: (hearts: number) => void;
+};
+
+export function SiteFooter({ visitorCount, hearts, onHeartsChange }: SiteFooterProps) {
   const [liked, setLiked] = useState(false);
   const [burst, setBurst] = useState(false);
 
   useEffect(() => {
-    const init = async () => {
-      if (localStorage.getItem(STATS_VERSION_KEY) !== STATS_VERSION) {
-        localStorage.removeItem("rhs.visited");
-        localStorage.removeItem("rhs.visitor.number");
-        localStorage.removeItem("rhs.hearts");
-        localStorage.removeItem(LIKED_KEY);
-        localStorage.setItem(STATS_VERSION_KEY, STATS_VERSION);
-      }
-
-      setLiked(localStorage.getItem(LIKED_KEY) === "1");
-
-      try {
-        const updated = await incrementOpen();
-        setCurrentCount(updated.currentCount);
-        setHearts(updated.likes);
-      } catch (error) {
-        console.error("[stats] Failed to load portfolio counters", error);
-        setCurrentCount(null);
-      }
-    };
-
-    void init();
+    setLiked(localStorage.getItem(LIKED_KEY) === "1");
   }, []);
 
   const toggleHeart = async () => {
@@ -50,10 +31,10 @@ export function SiteFooter() {
 
     try {
       const updated = await incrementLike();
-      setHearts(updated.likes);
+      onHeartsChange(updated.likes);
     } catch (error) {
       console.error("[stats] Failed to record like", error);
-      setHearts((count) => count + 1);
+      onHeartsChange(hearts + 1);
     }
 
     setLiked(true);
@@ -123,7 +104,7 @@ export function SiteFooter() {
             <span>
               You are the{" "}
               <span className="text-foreground">
-                {currentCount !== null ? ordinal(currentCount) : "—"}
+                {visitorCount !== null ? ordinal(visitorCount) : "—"}
               </span>{" "}
               visitor
             </span>

@@ -1,4 +1,7 @@
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+
+import { incrementOpen } from "@/lib/api/stats.functions";
 import { Cursor } from "@/components/portfolio/Cursor";
 import { Dock } from "@/components/portfolio/Dock";
 import { Observatory } from "@/components/portfolio/Observatory";
@@ -33,6 +36,21 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const [visitorCount, setVisitorCount] = useState<number | null>(null);
+  const [hearts, setHearts] = useState(0);
+
+  // Every page open increments the global visitor count (no per-user tracking).
+  useEffect(() => {
+    void incrementOpen()
+      .then((stats) => {
+        setVisitorCount(stats.currentCount);
+        setHearts(stats.likes);
+      })
+      .catch((error) => {
+        console.error("[stats] Failed to record visit", error);
+      });
+  }, []);
+
   return (
     <main className="relative min-h-screen w-full bg-background text-foreground antialiased">
       <Cursor />
@@ -47,7 +65,11 @@ function Index() {
       <Learning />
       <BuildLog />
       <Transmissions />
-      <SiteFooter />
+      <SiteFooter
+        visitorCount={visitorCount}
+        hearts={hearts}
+        onHeartsChange={setHearts}
+      />
     </main>
   );
 }

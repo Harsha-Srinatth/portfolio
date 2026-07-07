@@ -23,33 +23,19 @@ var headers = ((m) => function headersRouteRule(event) {
 //#endregion
 //#region #nitro/virtual/public-assets-data
 var public_assets_data_default = {
+	"/harsha_res.pdf": {
+		"type": "application/pdf",
+		"etag": "\"f39b-gkYitz6OY4zQNESn/d2mSoxQglQ\"",
+		"mtime": "2026-05-30T15:45:23.340Z",
+		"size": 62363,
+		"path": "../public/harsha_res.pdf"
+	},
 	"/icons.svg": {
 		"type": "image/svg+xml",
 		"etag": "\"13a7-+Yl6wl4T3p6mAdLxrF2TU9++/No\"",
 		"mtime": "2026-05-30T06:28:52.924Z",
 		"size": 5031,
 		"path": "../public/icons.svg"
-	},
-	"/assets/index-tYDxhnY9.js": {
-		"type": "text/javascript; charset=utf-8",
-		"etag": "\"54367-ps0m8Z9HihPa0rS5451NX2MtUUQ\"",
-		"mtime": "2026-06-12T16:10:43.646Z",
-		"size": 344935,
-		"path": "../public/assets/index-tYDxhnY9.js"
-	},
-	"/assets/routes-Oc0CBuxQ.js": {
-		"type": "text/javascript; charset=utf-8",
-		"etag": "\"2cc04-KeuBWR938IqKXcIfrAG2QeJx8to\"",
-		"mtime": "2026-06-12T16:10:43.649Z",
-		"size": 183300,
-		"path": "../public/assets/routes-Oc0CBuxQ.js"
-	},
-	"/assets/styles-7ZECHGnY.css": {
-		"type": "text/css; charset=utf-8",
-		"etag": "\"17413-RYzcVNXL1ZLlefM00YmcsBnxyuc\"",
-		"mtime": "2026-06-12T16:10:43.651Z",
-		"size": 95251,
-		"path": "../public/assets/styles-7ZECHGnY.css"
 	},
 	"/favicon.svg": {
 		"type": "image/svg+xml",
@@ -65,12 +51,26 @@ var public_assets_data_default = {
 		"size": 242208,
 		"path": "../public/Udemy-Ml-Certificate-Harsha.pdf"
 	},
-	"/harsha_res.pdf": {
-		"type": "application/pdf",
-		"etag": "\"f39b-gkYitz6OY4zQNESn/d2mSoxQglQ\"",
-		"mtime": "2026-05-30T15:45:23.340Z",
-		"size": 62363,
-		"path": "../public/harsha_res.pdf"
+	"/assets/index-DO8lt5X8.js": {
+		"type": "text/javascript; charset=utf-8",
+		"etag": "\"54367-LYyZB2x+GrSZTjRtd5DXsIlomiE\"",
+		"mtime": "2026-07-07T14:38:24.573Z",
+		"size": 344935,
+		"path": "../public/assets/index-DO8lt5X8.js"
+	},
+	"/assets/styles-7ZECHGnY.css": {
+		"type": "text/css; charset=utf-8",
+		"etag": "\"17413-RYzcVNXL1ZLlefM00YmcsBnxyuc\"",
+		"mtime": "2026-07-07T14:38:24.575Z",
+		"size": 95251,
+		"path": "../public/assets/styles-7ZECHGnY.css"
+	},
+	"/assets/routes-Cf6Dm2tl.js": {
+		"type": "text/javascript; charset=utf-8",
+		"etag": "\"2cb5f-koh98+lCkHQSopIAzWtaB9W6rSk\"",
+		"mtime": "2026-07-07T14:38:24.574Z",
+		"size": 183135,
+		"path": "../public/assets/routes-Cf6Dm2tl.js"
 	}
 };
 //#endregion
