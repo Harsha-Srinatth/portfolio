@@ -1,34 +1,32 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { incrementOpen } from "@/lib/api/stats.functions";
-import { Cursor } from "@/components/portfolio/Cursor";
-import { Dock } from "@/components/portfolio/Dock";
-import { Observatory } from "@/components/portfolio/Observatory";
-import { Ticker } from "@/components/portfolio/Ticker";
-import { About } from "@/components/portfolio/About";
-import { Constellation } from "@/components/portfolio/Constellation";
-import { Achievements } from "@/components/portfolio/Achievements";
-import { Stratum } from "@/components/portfolio/Stratum";
-import { Frequencies } from "@/components/portfolio/Frequencies";
-import { Learning } from "@/components/portfolio/Learning";
-import { BuildLog } from "@/components/portfolio/BuildLog";
-import { Transmissions } from "@/components/portfolio/Transmissions";
-import { SiteFooter } from "@/components/portfolio/SiteFooter";
+import { recordVisitOnce } from "@/lib/visit";
+import { Header } from "@/components/home/Header";
+import { Hero } from "@/components/home/Hero";
+import { About } from "@/components/home/About";
+import { Work } from "@/components/home/Work";
+import { Path } from "@/components/home/Path";
+import { Skills } from "@/components/home/Skills";
+import { Recognition } from "@/components/home/Recognition";
+import { BuildLog } from "@/components/home/BuildLog";
+import { Contact } from "@/components/home/Contact";
+import { Footer } from "@/components/home/Footer";
+import { Course } from "@/components/home/Section";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Ryali Harsha Srinatth — Full-Stack Engineer" },
+      { title: "Harsha Srinatth Ryali — Full-Stack Engineer" },
       {
         name: "description",
         content:
-          "Portfolio of Ryali Harsha Srinatth (Harsha) — CSBS undergraduate from Bhimavaram, AP. Full-stack, MERN, and machine learning engineering.",
+          "Portfolio of Harsha Srinatth Ryali — Computer Science & Business Systems at SRKR Engineering College, Bhimavaram. Full-stack, backend and MERN engineering.",
       },
-      { property: "og:title", content: "Ryali Harsha Srinatth — Full-Stack Engineer" },
+      { property: "og:title", content: "Harsha Srinatth Ryali — Full-Stack Engineer" },
       {
         property: "og:description",
-        content: "Backend · Full-stack · AI engineering. Built by hand.",
+        content: "Scalable MERN systems, real-time communication and data-driven products.",
       },
     ],
   }),
@@ -37,11 +35,13 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [visitorCount, setVisitorCount] = useState<number | null>(null);
-  const [hearts, setHearts] = useState(0);
+  const [hearts, setHearts] = useState<number | null>(null);
 
   // Every page open increments the global visitor count (no per-user tracking).
+  // recordVisitOnce() guarantees one increment per page load, even under
+  // Strict Mode or remounts.
   useEffect(() => {
-    void incrementOpen()
+    void recordVisitOnce()
       .then((stats) => {
         setVisitorCount(stats.currentCount);
         setHearts(stats.likes);
@@ -52,24 +52,31 @@ function Index() {
   }, []);
 
   return (
-    <main className="relative min-h-screen w-full bg-background text-foreground antialiased">
-      <Cursor />
-      <Dock />
-      <Observatory />
-      <Ticker />
-      <About />
-      <Constellation />
-      <Stratum />
-      <Frequencies />
-      <Achievements />
-      <Learning />
-      <BuildLog />
-      <Transmissions />
-      <SiteFooter
-        visitorCount={visitorCount}
-        hearts={hearts}
-        onHeartsChange={setHearts}
-      />
-    </main>
+    <>
+      <a
+        href="#about"
+        className="sr-only z-[70] rounded-full bg-foreground px-4 py-2 text-background focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+      >
+        Skip to content
+      </a>
+      <Header />
+      <main className="relative w-full">
+        <Hero />
+        <About />
+        <Course />
+        <Work />
+        <Course />
+        <Path />
+        <Course />
+        <Skills />
+        <Course />
+        <Recognition />
+        <Course />
+        <BuildLog />
+        <Course />
+        <Contact />
+      </main>
+      <Footer visitorCount={visitorCount} hearts={hearts} onHeartsChange={setHearts} />
+    </>
   );
 }

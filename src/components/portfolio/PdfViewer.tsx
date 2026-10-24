@@ -29,19 +29,17 @@ export function PdfViewer({ open, onClose, src, title, downloadName }: PdfViewer
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col bg-background/95 backdrop-blur-md">
+    <div className="fixed inset-0 z-[100] flex flex-col bg-background/95 backdrop-blur-md" role="dialog" aria-modal="true" aria-label={title}>
       <div className="flex items-center justify-between gap-4 border-b border-border bg-card/80 px-4 py-3 md:px-6">
         <div>
-          <p className="font-mono text-sm text-foreground">{title}</p>
-          <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-            PDF preview — scroll or use viewer controls
-          </p>
+          <p className="text-[0.95rem] text-foreground">{title}</p>
+          <p className="text-[0.8rem] text-muted-foreground">Press Esc to close</p>
         </div>
         <div className="flex items-center gap-2">
           <a
             href={src}
             download={downloadName}
-            className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+            className="inline-flex h-10 items-center gap-2 rounded-full border border-foreground/25 px-4 text-[0.88rem] text-foreground/80 transition-colors hover:border-foreground/60 hover:text-foreground"
           >
             <Download className="h-3.5 w-3.5" />
             Download
@@ -50,7 +48,7 @@ export function PdfViewer({ open, onClose, src, title, downloadName }: PdfViewer
             type="button"
             onClick={onClose}
             aria-label="Close document viewer"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-foreground/25 text-foreground/80 transition-colors hover:border-foreground/60 hover:text-foreground"
           >
             <X className="h-4 w-4" />
           </button>

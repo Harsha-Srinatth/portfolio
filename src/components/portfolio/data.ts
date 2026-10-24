@@ -3,7 +3,7 @@ export const PERSON = {
   shortName: "Harsha",
   initials: "RHS",
   tagline:
-    "Building scalable MERN-stack systems — full-stack development, real-time communication, and data-driven product workflows.",
+    "Building scalable MERN-stack systems: full-stack development, real-time communication, and data-driven product workflows.",
   taglineContext:
     "A Computer Science & Business Systems undergraduate at SRKR Engineering College, Bhimavaram.",
   about: [
@@ -16,6 +16,10 @@ export const PERSON = {
   education: "B.Tech CSBS (Computer Science & Business Systems) — 8.75 / 10 CGPA",
   also: "Music · Lo-fi · Ambient · Instrumental",
   resumeUrl: "/harsha_res.pdf",
+  // Profile photo for the hero card, e.g. "/profile.jpg" in /public.
+  // Until one is added, the card shows the HS monogram instead.
+  photo: undefined as string | undefined,
+  likes: ["Listening to music", "Exploring tech", "Good food", "Travel & capturing moments"],
   socials: [
     { label: "GitHub", handle: "@Harsha-Srinatth", url: "https://github.com/Harsha-Srinatth" },
     {
