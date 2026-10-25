@@ -3,12 +3,17 @@ export const PERSON = {
   shortName: "Harsha",
   initials: "RHS",
   tagline:
-    "Building scalable MERN-stack systems: full-stack development, real-time communication, and data-driven product workflows.",
+    "Building scalable MERN-stack systems — full-stack development, real-time communication, and data-driven product workflows.",
   taglineContext:
     "A Computer Science & Business Systems undergraduate at SRKR Engineering College, Bhimavaram.",
   about: [
     "I'm Harsha Srinatth Ryali, a passionate developer who enjoys turning ideas into practical software and continuously exploring how technology can solve real-world problems. My interests span Full Stack Development, System Design, and Artificial Intelligence, where I focus on building applications that are scalable, user-centric, and impactful.",
     "I primarily work with React, Node.js, Express.js, MongoDB, and modern web technologies while expanding my knowledge in Machine Learning and intelligent systems. Having successfully completed a 99-hour Data Science, Machine Learning, Deep Learning, and NLP Bootcamp, I am driven by curiosity, continuous learning, and the challenge of building technology that creates meaningful value.",
+  ],
+  // the About section's short introduction (the paragraphs above, condensed)
+  summary: [
+    "I turn ideas into practical software, with a focus on full-stack development, system design and AI.",
+    "I build with React, Node.js, Express and MongoDB, and I'm growing into machine learning after a 99-hour data science and ML bootcamp.",
   ],
   email: "harshasrinatth18@gmail.com",
   phone: "+91 8179831468",
@@ -132,11 +137,11 @@ export const BUILD_LOG = [
 ];
 
 export const BEYOND_CODE = [
-  { icon: "🎧", label: "Music", note: "Lo-fi · Ambient · Instrumental" },
-  { icon: "🏸", label: "Badminton", note: "Competitive" },
-  { icon: "🏏", label: "Cricket", note: "Kohli fan" },
-  { icon: "◎", label: "Carrom", note: "Precision" },
-];
+  { key: "music", label: "Music", note: "Lo-fi, ambient and instrumental" },
+  { key: "badminton", label: "Badminton", note: "Competitive on court" },
+  { key: "cricket", label: "Cricket", note: "Kohli fan" },
+  { key: "carrom", label: "Carrom", note: "A game of precision" },
+] as const;
 
 export type Project = {
   id: string;
@@ -147,6 +152,14 @@ export type Project = {
   blurb: string;
   detail: string;
   url?: string;
+  /** source repository, where one is public */
+  repo?: string;
+  /** one line for the project card */
+  short: string;
+  /** icon highlights under the title (icon names from lucide-react) */
+  highlights: { icon: string; label: string }[];
+  features: string[];
+  stack: string[];
   signal: number; // 0..1 for ring intensity
   hue: number; // visual ring orientation
   metrics: { label: string; value: string }[];
@@ -160,6 +173,21 @@ export const PROJECTS: Project[] = [
     year: "2025",
     kind: "Academic & Skill Platform",
     url: "https://student-frontend-phi.vercel.app",
+    repo: "https://github.com/Harsha-Srinatth/student-frontend",
+    short: "One platform for academics, live updates and peer skill exchange.",
+    highlights: [
+      { icon: "Layers", label: "Full-stack" },
+      { icon: "Radio", label: "Real-time" },
+      { icon: "Brain", label: "ML insights" },
+      { icon: "ShieldCheck", label: "Role-based access" },
+    ],
+    features: [
+      "Student, Faculty and HOD portals",
+      "Live notifications and doubt threads",
+      "Peer-to-peer skill exchange",
+      "Placement-readiness predictions",
+    ],
+    stack: ["React", "Node.js", "Express", "MongoDB", "Socket.IO", "Python ML"],
     blurb:
       "A centralized MERN + ML platform unifying academic tracking, real-time communication, and peer skill exchange across an entire institution.",
     detail:
@@ -179,6 +207,21 @@ export const PROJECTS: Project[] = [
     year: "2025",
     kind: "Full-Stack Productivity",
     url: "https://note-vault-green.vercel.app",
+    repo: "https://github.com/Harsha-Srinatth/Notes-BookMarks-Frontend",
+    short: "Notes and bookmarks with search, tags and auto-fetched titles.",
+    highlights: [
+      { icon: "Layers", label: "Full-stack" },
+      { icon: "Search", label: "Smart search" },
+      { icon: "Tags", label: "Tagging" },
+      { icon: "ShieldCheck", label: "Secure accounts" },
+    ],
+    features: [
+      "Full CRUD on notes and bookmarks",
+      "Server-side search and tag filters",
+      "Bookmark titles fetched automatically",
+      "Private data per account",
+    ],
+    stack: ["Next.js", "Express", "MongoDB", "JWT", "Framer Motion"],
     blurb:
       "A full-stack personal productivity app for managing notes and bookmarks with secure authentication, smart search, tagging, and an animated modern UI.",
     detail:
@@ -198,6 +241,21 @@ export const PROJECTS: Project[] = [
     year: "2025",
     kind: "Predictive Intelligence System",
     url: "https://study-habit-backend-oerf.vercel.app",
+    repo: "https://github.com/Harsha-Srinatth/StudyHabit_Predictor",
+    short: "Predicts study outcomes from daily habits and coaches you.",
+    highlights: [
+      { icon: "Brain", label: "Machine learning" },
+      { icon: "Gauge", label: "Predictions" },
+      { icon: "Workflow", label: "Six-step intake" },
+      { icon: "Sparkles", label: "Coaching" },
+    ],
+    features: [
+      "Six-step intake of 14 habits",
+      "Random forest outcome prediction",
+      "FastAPI inference service",
+      "Tiered, personal coaching tips",
+    ],
+    stack: ["React", "FastAPI", "scikit-learn", "Pydantic", "Render"],
     blurb:
       "A full-stack machine learning product that predicts student study outcomes from daily behavioral signals and delivers actionable, personalized coaching in real time.",
     detail:
@@ -216,6 +274,20 @@ export const PROJECTS: Project[] = [
     title: "AgriSense AI",
     year: "2025",
     kind: "AgriTech · Generative AI",
+    short: "A multilingual farming assistant for crops, soil and disease.",
+    highlights: [
+      { icon: "Bot", label: "Generative AI" },
+      { icon: "Leaf", label: "Disease detection" },
+      { icon: "Languages", label: "Four languages" },
+      { icon: "CloudSun", label: "Weather aware" },
+    ],
+    features: [
+      "Crop and fertilizer recommendations",
+      "Disease detection from photos",
+      "English, Hindi, Telugu and Tamil",
+      "Read-aloud results for the field",
+    ],
+    stack: ["React", "Flask", "Gemini 2.5 Flash", "Web Speech API", "WeatherAPI"],
     blurb:
       "An AI-powered, multilingual farming companion that turns soil, weather, and crop images into actionable recommendations farmers can read or hear.",
     detail:
@@ -228,25 +300,7 @@ export const PROJECTS: Project[] = [
       { label: "API", value: "4 REST endpoints" },
     ],
   },
-  {
-    id: "verve",
-    codename: "VRV-05",
-    title: "Verve",
-    year: "2025",
-    kind: "Campus Engagement System",
-    url: "https://my-frontend-kohl.vercel.app",
-    blurb:
-      "A campus-wide social ecosystem designed to transform student participation into a connected digital experience for clubs, sports, culture, and peer communities.",
-    detail:
-      "MERN-stack platform enabling clubs, cultural organizations, sports teams, and learners to share updates, build communities, and foster collaboration. JWT authentication and authorization, post creation with likes and comments, follow/follower graph, profile management, and community discovery — all backed by a RESTful API architecture built for secure, scalable campus engagement.",
-    signal: 0.84,
-    hue: 268,
-    metrics: [
-      { label: "Communities", value: "Clubs · Sports · Culture" },
-      { label: "Engagement", value: "Posts · Likes · Comments" },
-      { label: "Stack", value: "React · Node · MongoDB · JWT" },
-    ],
-  },
+
 ];
 
 export type Stratum = {
@@ -323,5 +377,4 @@ export const SIGNALS = [
   "07:42 · notes-bookmarks auto-fetched 12 bookmark titles overnight",
   "12:03 · habitiq scored a study session from 14 behavioral signals",
   "16:21 · agrisense diagnosed crop disease from a field photo in Telugu",
-  "19:55 · verve connected three campus clubs in one engagement feed",
 ];

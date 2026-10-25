@@ -102,7 +102,8 @@ export function Hero() {
   useEffect(() => {
     const el = section.current;
     if (!el) return;
-    const io = new IntersectionObserver(([e]) => el.classList.toggle("hero-still", !e.isIntersecting));
+    // wakes a little before it scrolls back into view, so it is ready on arrival
+    const io = new IntersectionObserver(([e]) => el.classList.toggle("hero-still", !e.isIntersecting), { rootMargin: "300px 0px" });
     io.observe(el);
     return () => io.disconnect();
   }, []);
@@ -153,8 +154,8 @@ export function Hero() {
             style={{ animationDelay: "0.7s" }}
           >
             {PERSON.tagline}
-            {/* phones keep to the first sentence, as in the mobile reference */}
-            <span className="max-sm:hidden"> {PERSON.taglineContext}</span>
+            {" "}
+            {PERSON.taglineContext}
           </p>
 
           <div

@@ -445,8 +445,8 @@ function buildSpray(ax: number, ay: number, ang: number, o: SprayOpts, rand: () 
     stem: sink.stems.join(""),
     group: o.group,
     // one cycle holds a dozen or so gusts (see `breeze` in styles.css)
-    dur: 24 + rand() * 10,
-    delay: -rand() * 34,
+    dur: 30 + rand() * 12,
+    delay: -rand() * 42,
     amp: 3.5 + reach * (1.5 + rand() * 2),
   };
 }
@@ -469,8 +469,8 @@ function mergeSprays(parts: Spray[], ax: number, ay: number, rand: () => number,
     stem: parts.map((p) => p.stem).join(""),
     group,
     ...(group === "crown"
-      ? { dur: 30 + rand() * 10, delay: -rand() * 40, amp: 1.4 + rand() * 0.8 }
-      : { dur: 24 + rand() * 10, delay: -rand() * 34, amp: (parts.reduce((a, p) => a + p.amp, 0) / parts.length) * 0.9 }),
+      ? { dur: 36 + rand() * 12, delay: -rand() * 48, amp: 1.4 + rand() * 0.8 }
+      : { dur: 30 + rand() * 12, delay: -rand() * 42, amp: (parts.reduce((a, p) => a + p.amp, 0) / parts.length) * 0.9 }),
   };
 }
 
@@ -672,8 +672,8 @@ function buildTuft(x0: number, x1: number, baseY: (x: number) => number, rand: (
     h: sink.maxY - sink.minY + pad * 2,
     tones: sink.tones.map((t) => t.join("")),
     blades: blades.join(""),
-    dur: 20 + rand() * 8,
-    delay: -rand() * 28,
+    dur: 26 + rand() * 10,
+    delay: -rand() * 36,
     amp: 3.5 + rand() * 2.5,
   };
 }
@@ -1046,8 +1046,8 @@ export function buildTreeArt(density = 1): TreeArt {
         d: part.flatMap((s) => s.tones).join(""),
         flecks: flecks.join(""),
         fringe: group === "fringe",
-        dur: 26 + rand() * 10,
-        delay: -rand() * 36,
+        dur: 32 + rand() * 12,
+        delay: -rand() * 44,
         amp: 1.6 + rand() * 1,
       });
     }

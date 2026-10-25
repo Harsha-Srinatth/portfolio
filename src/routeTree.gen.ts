@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiStatsRouteImport } from './routes/api/stats'
+import { Route as ApiGithubRouteImport } from './routes/api/github'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,30 +23,39 @@ const ApiStatsRoute = ApiStatsRouteImport.update({
   path: '/api/stats',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiGithubRoute = ApiGithubRouteImport.update({
+  id: '/api/github',
+  path: '/api/github',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/github': typeof ApiGithubRoute
   '/api/stats': typeof ApiStatsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/github': typeof ApiGithubRoute
   '/api/stats': typeof ApiStatsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/github': typeof ApiGithubRoute
   '/api/stats': typeof ApiStatsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/stats'
+  fullPaths: '/' | '/api/github' | '/api/stats'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/stats'
-  id: '__root__' | '/' | '/api/stats'
+  to: '/' | '/api/github' | '/api/stats'
+  id: '__root__' | '/' | '/api/github' | '/api/stats'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiGithubRoute: typeof ApiGithubRoute
   ApiStatsRoute: typeof ApiStatsRoute
 }
 
@@ -65,11 +75,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiStatsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/github': {
+      id: '/api/github'
+      path: '/api/github'
+      fullPath: '/api/github'
+      preLoaderRoute: typeof ApiGithubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiGithubRoute: ApiGithubRoute,
   ApiStatsRoute: ApiStatsRoute,
 }
 export const routeTree = rootRouteImport

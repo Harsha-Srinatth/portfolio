@@ -2,6 +2,8 @@ import { useState, useSyncExternalStore } from "react";
 import { Heart } from "lucide-react";
 
 import { incrementLike } from "@/lib/api/stats.functions";
+import { Ground } from "./Ambient";
+import { useInView } from "./useInView";
 
 function ordinal(n: number) {
   const s = ["th", "st", "nd", "rd"];
@@ -38,6 +40,7 @@ export function Footer({ visitorCount, hearts, onHeartsChange }: FooterProps) {
   const liked = likedBefore || likedNow;
   const [pending, setPending] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [ref, live] = useInView<HTMLElement>();
 
   const applaud = async () => {
     if (liked || pending) return;
@@ -61,7 +64,7 @@ export function Footer({ visitorCount, hearts, onHeartsChange }: FooterProps) {
   };
 
   return (
-    <footer className="relative border-t border-border">
+    <footer ref={ref} data-live={live} className="relative border-t border-border">
       <div className="mx-auto grid max-w-[1680px] grid-cols-1 gap-12 px-6 py-20 md:px-12 lg:grid-cols-12 lg:px-16">
         <div className="lg:col-span-4">
           <p className="font-display text-[clamp(1.6rem,2.4vw,2.2rem)] font-[360] leading-[1.15] tracking-[-0.015em]">
@@ -120,6 +123,8 @@ export function Footer({ visitorCount, hearts, onHeartsChange }: FooterProps) {
           </div>
         </div>
       </div>
+      {/* the page ends on the same ground the hero begins with */}
+      <Ground />
     </footer>
   );
 }

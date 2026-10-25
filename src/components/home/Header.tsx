@@ -108,7 +108,7 @@ export function Header() {
           </div>
           <nav aria-label="Mobile" className="flex flex-1 flex-col justify-center px-6 pb-24">
             <ul className="space-y-2">
-              {[...NAV, { href: "#frequencies", label: "Skills" }, { href: "#achievements", label: "Recognition" }].map((n) => (
+              {[...NAV, { href: "#frequencies", label: "Skills" }, { href: "#achievements", label: "Achievements" }].map((n) => (
                 <li key={n.href}>
                   <a href={n.href} onClick={() => setMenuOpen(false)} className="font-display block py-1.5 text-[2.6rem] leading-tight tracking-tight">
                     {n.label}

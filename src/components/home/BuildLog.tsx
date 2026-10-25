@@ -1,7 +1,23 @@
 import { useState } from "react";
+import { CircleAlert, TrendingUp, Wrench, type LucideIcon } from "lucide-react";
 
 import { BUILD_LOG } from "@/components/portfolio/data";
 import { Section } from "./Section";
+import { Card } from "./ui";
+
+function Row({ icon: Icon, label, children, strong = false }: { icon: LucideIcon; label: string; children: string; strong?: boolean }) {
+  return (
+    <div className="flex gap-3">
+      <span aria-hidden className={`mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-lg ${strong ? "bg-accent text-accent-foreground" : "bg-secondary text-foreground/70"}`}>
+        <Icon className="h-3.5 w-3.5" strokeWidth={1.8} />
+      </span>
+      <div>
+        <p className="text-[0.78rem] text-muted-foreground">{label}</p>
+        <p className={`mt-0.5 text-[0.97rem] leading-snug ${strong ? "text-accent" : ""}`}>{children}</p>
+      </div>
+    </div>
+  );
+}
 
 export function BuildLog() {
   const [active, setActive] = useState(BUILD_LOG[0].month);
@@ -31,28 +47,21 @@ export function BuildLog() {
         })}
       </div>
 
-      <div id="log-panel" role="tabpanel" aria-labelledby={`log-${active}`} className="mt-10">
-        <div className="hidden grid-cols-3 gap-8 border-b border-border pb-3 text-[0.82rem] text-muted-foreground md:grid">
-          <span>Problem</span>
-          <span>What I changed</span>
-          <span>Result</span>
-        </div>
-        <ul>
-          {current.entries.map((e) => (
-            <li key={e.challenge} className="grid gap-2 border-b border-border py-6 md:grid-cols-3 md:gap-8">
-              <p className="text-[1.02rem] leading-relaxed">{e.challenge}</p>
-              <p className="text-[1rem] leading-relaxed text-foreground/75">
-                <span className="text-muted-foreground md:hidden">Changed: </span>
-                {e.solution}
-              </p>
-              <p className="text-[1rem] leading-relaxed text-accent">
-                <span className="text-muted-foreground md:hidden">Result: </span>
-                {e.outcome}
-              </p>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <ul id="log-panel" role="tabpanel" aria-labelledby={`log-${active}`} className="mt-7 grid gap-4 md:grid-cols-3">
+        {current.entries.map((e, i) => (
+          <Card as="li" key={e.challenge} className="reveal space-y-5 p-6" style={{ ["--i" as string]: i }}>
+            <Row icon={CircleAlert} label="Problem">
+              {e.challenge}
+            </Row>
+            <Row icon={Wrench} label="What I changed">
+              {e.solution}
+            </Row>
+            <Row icon={TrendingUp} label="Result" strong>
+              {e.outcome}
+            </Row>
+          </Card>
+        ))}
+      </ul>
     </Section>
   );
 }

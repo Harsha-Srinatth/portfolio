@@ -108,7 +108,7 @@ export function ProfileCard() {
           </span>
         )}
       </div>
-      <h3 className="font-display mt-[1em] text-[1.1em] font-[450]">Things I Like</h3>
+      <h3 className="font-display mt-[1em] text-[1.1em] font-[450]">My interests</h3>
       <ul className="mt-[0.55em] space-y-[0.55em] text-[0.74em]">
         {PERSON.likes.map((like, i) => {
           const Icon = LIKE_ICONS[i % LIKE_ICONS.length];

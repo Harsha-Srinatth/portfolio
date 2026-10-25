@@ -37,21 +37,24 @@ function place(x: number, y: number, w: number, h: number): CSSProperties {
   };
 }
 
-const sway = (dur: number, delay: number, amp: number) => ({
+/** The nearest of the fixed amplitude steps in styles.css (0.6° … 7.5°). */
+const STEPS = [0.6, 1, 1.5, 2.2, 3, 4, 5.5, 7.5];
+const ampStep = (amp: number) => `amp-${STEPS.reduce((best, a, i) => (Math.abs(a - amp) < Math.abs(STEPS[best] - amp) ? i : best), 0)}`;
+
+const sway = (dur: number, delay: number) => ({
   ["--dur" as string]: `${dur.toFixed(2)}s`,
   ["--delay" as string]: `${delay.toFixed(2)}s`,
-  ["--amp" as string]: `${amp.toFixed(2)}deg`,
 });
 
 function SprayLayer({ s, alt }: { s: Spray; alt?: boolean }) {
   return (
     <div
       aria-hidden
-      className={`leaf-sway absolute ${alt ? "sway-alt" : ""} ${s.group === "fringe" ? "scene-fringe" : ""}`}
+      className={`leaf-sway absolute ${ampStep(s.amp)} ${alt ? "sway-alt" : ""} ${s.group === "fringe" ? "scene-fringe" : ""}`}
       style={{
         ...place(s.x, s.y, s.w, s.h),
         transformOrigin: `${(s.ox * 100).toFixed(1)}% ${(s.oy * 100).toFixed(1)}%`,
-        ...sway(s.dur, s.delay, s.amp),
+        ...sway(s.dur, s.delay),
       }}
     >
       <svg viewBox={`${f(s.x)} ${f(s.y)} ${f(s.w)} ${f(s.h)}`} data-freeze="" className="block h-full w-full overflow-visible">
@@ -65,7 +68,7 @@ function SprayLayer({ s, alt }: { s: Spray; alt?: boolean }) {
 
 function TuftLayer({ t, alt }: { t: Tuft; alt?: boolean }) {
   return (
-    <div aria-hidden className={`grass-sway absolute ${alt ? "sway-alt" : ""}`} style={{ ...place(t.x, t.y, t.w, t.h), transformOrigin: "50% 100%", ...sway(t.dur, t.delay, t.amp) }}>
+    <div aria-hidden className={`grass-sway absolute ${ampStep(t.amp)} ${alt ? "sway-alt" : ""}`} style={{ ...place(t.x, t.y, t.w, t.h), transformOrigin: "50% 100%", ...sway(t.dur, t.delay) }}>
       <svg viewBox={`${f(t.x)} ${f(t.y)} ${f(t.w)} ${f(t.h)}`} data-freeze="" className="block h-full w-full overflow-visible">
         {t.tones.map((d, i) => (d ? <path key={i} d={d} fill={`var(--leaf-${i + 1})`} /> : null))}
         {t.blades && <path d={t.blades} fill="var(--grass)" />}
@@ -112,8 +115,8 @@ function ShadeLayer({ s, i }: { s: Shade; i: number }) {
   return (
     <div
       aria-hidden
-      className={`leaf-sway scene-dapple absolute ${s.fringe ? "scene-fringe" : ""}`}
-      style={{ ...place(s.x, s.y, s.w, s.h), transformOrigin: "50% 0%", ...sway(s.dur, s.delay, s.amp) }}
+      className={`leaf-sway scene-dapple absolute ${ampStep(s.amp)} ${s.fringe ? "scene-fringe" : ""}`}
+      style={{ ...place(s.x, s.y, s.w, s.h), transformOrigin: "50% 0%", ...sway(s.dur, s.delay) }}
     >
       <svg viewBox={`${f(s.x)} ${f(s.y)} ${f(s.w)} ${f(s.h)}`} data-freeze="" className="block h-full w-full overflow-visible">
         <defs>

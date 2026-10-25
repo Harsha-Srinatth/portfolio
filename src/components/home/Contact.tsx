@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { ArrowUpRight, Check, Copy } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { ArrowUpRight, Briefcase, Check, Copy, Mail, MapPin, Phone } from "lucide-react";
 
 import { PERSON } from "@/components/portfolio/data";
 import { Section } from "./Section";
+import { Card, GithubMark, IconChip, LinkedinMark } from "./ui";
 
 function CopyButton({ value, label }: { value: string; label: string }) {
   const [copied, setCopied] = useState(false);
@@ -20,7 +21,7 @@ function CopyButton({ value, label }: { value: string; label: string }) {
       type="button"
       onClick={() => void copy()}
       aria-label={copied ? `${label} copied` : `Copy ${label}`}
-      className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-foreground/20 text-foreground/70 transition-colors duration-500 hover:border-foreground/60 hover:text-foreground"
+      className="relative z-10 grid h-9 w-9 shrink-0 place-items-center rounded-full border border-foreground/20 text-foreground/70 transition-colors duration-500 hover:border-foreground/60 hover:text-foreground"
     >
       {copied ? <Check className="h-4 w-4" strokeWidth={1.6} /> : <Copy className="h-4 w-4" strokeWidth={1.6} />}
     </button>
@@ -29,6 +30,16 @@ function CopyButton({ value, label }: { value: string; label: string }) {
 
 export function Contact() {
   const tel = PERSON.phone.replace(/\s+/g, "");
+  const icon = (label: string): ReactNode =>
+    label === "Email" ? (
+      <Mail className="h-5 w-5" strokeWidth={1.6} />
+    ) : label === "Phone" ? (
+      <Phone className="h-5 w-5" strokeWidth={1.6} />
+    ) : label === "GitHub" ? (
+      <GithubMark className="h-5 w-5" />
+    ) : (
+      <LinkedinMark className="h-[1.1rem] w-[1.1rem]" />
+    );
   const channels = [
     { label: "Email", value: PERSON.email, href: `mailto:${PERSON.email}`, copy: true },
     { label: "Phone", value: PERSON.phone, href: `tel:${tel}`, copy: true },
@@ -37,42 +48,56 @@ export function Contact() {
 
   return (
     <Section id="transmissions" title="Contact" note="Usually replies within a day.">
-      <p className="font-display max-w-[44rem] text-balance text-[clamp(1.9rem,3.6vw,3.3rem)] font-[340] leading-[1.12] tracking-[-0.02em]">
-        Have an idea, a difficult problem or a role in mind? I’d like to hear about it.
-      </p>
-
-      <ul className="mt-12 max-w-[46rem] border-t border-border">
-        {channels.map((c) => {
-          const external = c.href.startsWith("http");
-          return (
-            <li key={c.label} className="flex items-center gap-4 border-b border-border py-5">
-              <span className="w-24 shrink-0 text-[0.85rem] text-muted-foreground">{c.label}</span>
-              <a
-                href={c.href}
-                {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
-                className="group flex min-w-0 flex-1 items-center gap-2 text-[clamp(1rem,1.6vw,1.25rem)]"
-              >
-                <span className="link-underline truncate">{c.value}</span>
-                {external && (
-                  <ArrowUpRight className="h-4 w-4 shrink-0 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" strokeWidth={1.6} />
-                )}
-              </a>
-              {c.copy && <CopyButton value={c.value} label={c.label.toLowerCase()} />}
+      <div className="grid gap-10 xl:grid-cols-12 xl:gap-8">
+        <div className="xl:col-span-5">
+          <p className="font-display max-w-[30rem] text-balance text-[clamp(1.8rem,3vw,2.7rem)] font-[340] leading-[1.15] tracking-[-0.02em]">
+            Have an idea, a difficult problem or a role in mind? I’d like to hear about it.
+          </p>
+          <ul className="mt-8 space-y-4">
+            <li className="flex items-center gap-3">
+              <IconChip className="!h-9 !w-9">
+                <Briefcase className="h-4 w-4" strokeWidth={1.6} />
+              </IconChip>
+              <span>
+                <span className="block text-[0.8rem] text-muted-foreground">Open to</span>
+                Backend, full-stack and AI engineering roles
+              </span>
             </li>
-          );
-        })}
-      </ul>
+            <li className="flex items-center gap-3">
+              <IconChip className="!h-9 !w-9">
+                <MapPin className="h-4 w-4" strokeWidth={1.6} />
+              </IconChip>
+              <span>
+                <span className="block text-[0.8rem] text-muted-foreground">Based in</span>
+                {PERSON.location}, India
+              </span>
+            </li>
+          </ul>
+        </div>
 
-      <dl className="mt-10 grid max-w-[46rem] grid-cols-1 gap-6 sm:grid-cols-2">
-        <div>
-          <dt className="text-[0.82rem] text-muted-foreground">Open to</dt>
-          <dd className="mt-1.5">Backend, full-stack and AI engineering roles</dd>
-        </div>
-        <div>
-          <dt className="text-[0.82rem] text-muted-foreground">Based in</dt>
-          <dd className="mt-1.5">{PERSON.location}, India</dd>
-        </div>
-      </dl>
+        <ul className="grid content-start gap-4 sm:grid-cols-2 xl:col-span-7">
+          {channels.map((c, i) => {
+            const external = c.href.startsWith("http");
+            return (
+              <Card as="li" key={c.label} className="reveal relative flex items-center gap-4 p-5 transition-colors duration-300 hover:border-foreground/30" style={{ ["--i" as string]: i % 2 }}>
+                <IconChip>{icon(c.label)}</IconChip>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[0.8rem] text-muted-foreground">{c.label}</p>
+                  <a
+                    href={c.href}
+                    {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
+                    className="mt-0.5 flex items-center gap-1.5 text-[0.98rem] after:absolute after:inset-0 after:rounded-[1.4rem]"
+                  >
+                    <span className="truncate">{c.value}</span>
+                    {external && <ArrowUpRight className="h-4 w-4 shrink-0" strokeWidth={1.6} />}
+                  </a>
+                </div>
+                {c.copy && <CopyButton value={c.value} label={c.label.toLowerCase()} />}
+              </Card>
+            );
+          })}
+        </ul>
+      </div>
     </Section>
   );
 }

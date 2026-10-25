@@ -116,6 +116,14 @@
   --shade-leaf: rgb(112 70 32 / 0.27);
   --sun-pool: rgb(255 238 204 / 0.6);
   --reveal-glow: rgb(255 228 168 / 0.7);
+  /* illustrations (hobby pictures, project previews) */
+  --art-ink: #2a221c;
+  --art-ink-2: #3b3029;
+  --art-red: #9a3f2c;
+  --art-cream: #fbf3e4;
+  --art-metal: #b9ab96;
+  --art-floor: #e9d6ba;
+  --contrib-0: rgb(28 26 22 / 0.07);
   --sun-fleck: rgb(255 240 204 / 0.62);
   --card-paper: #f7ebdc;
   --card-paper-fg: #1f1a15;
@@ -188,6 +196,13 @@
   --sun-fleck: rgb(255 226 170 / 0.05);
   --sun-pool: rgb(255 226 170 / 0.03);
   --reveal-glow: rgb(214 176 112 / 0.22);
+  --art-ink: #0f0c0a;
+  --art-ink-2: #1d1814;
+  --art-red: #7f3325;
+  --art-cream: #d9cdb9;
+  --art-metal: #7c705f;
+  --art-floor: #241e17;
+  --contrib-0: rgb(236 230 218 / 0.08);
   --card-paper: #262019;
   --card-paper-fg: #eee6da;
   --card-paper-border: rgb(236 230 218 / 0.1);
@@ -411,85 +426,544 @@
    runs on the compositor. */
 .leaf-sway,
 .grass-sway {
-  animation: breeze var(--dur, 40s) ease-in-out var(--delay, 0s) infinite;
+  animation: breeze-3 var(--dur, 40s) ease-in-out var(--delay, 0s) infinite;
   will-change: transform;
 }
-.sway-alt {
-  animation-name: breeze-alt;
-}
-/* grass shears from its base instead of turning, so a whole row of tufts
-   leans together while every base stays on the ground */
-.grass-sway {
-  animation-name: grass;
-}
-.grass-sway.sway-alt {
-  animation-name: grass-alt;
-}
+/* Each layer's amplitude is one of eight fixed steps (amp-0 … amp-7, from
+   0.6° to 7.5°; see ampStep() in BotanicalScene.tsx). Plain numbers in the
+   keyframes, not var(), keep the breeze on the compositor. Grass shears
+   from its base instead of turning, so each tuft's roots stay put. */
+.leaf-sway.amp-0 { animation-name: breeze-0; }
+.leaf-sway.sway-alt.amp-0 { animation-name: breeze-alt-0; }
+.grass-sway.amp-0 { animation-name: grass-0; }
+.grass-sway.sway-alt.amp-0 { animation-name: grass-alt-0; }
+.leaf-sway.amp-1 { animation-name: breeze-1; }
+.leaf-sway.sway-alt.amp-1 { animation-name: breeze-alt-1; }
+.grass-sway.amp-1 { animation-name: grass-1; }
+.grass-sway.sway-alt.amp-1 { animation-name: grass-alt-1; }
+.leaf-sway.amp-2 { animation-name: breeze-2; }
+.leaf-sway.sway-alt.amp-2 { animation-name: breeze-alt-2; }
+.grass-sway.amp-2 { animation-name: grass-2; }
+.grass-sway.sway-alt.amp-2 { animation-name: grass-alt-2; }
+.leaf-sway.amp-3 { animation-name: breeze-3; }
+.leaf-sway.sway-alt.amp-3 { animation-name: breeze-alt-3; }
+.grass-sway.amp-3 { animation-name: grass-3; }
+.grass-sway.sway-alt.amp-3 { animation-name: grass-alt-3; }
+.leaf-sway.amp-4 { animation-name: breeze-4; }
+.leaf-sway.sway-alt.amp-4 { animation-name: breeze-alt-4; }
+.grass-sway.amp-4 { animation-name: grass-4; }
+.grass-sway.sway-alt.amp-4 { animation-name: grass-alt-4; }
+.leaf-sway.amp-5 { animation-name: breeze-5; }
+.leaf-sway.sway-alt.amp-5 { animation-name: breeze-alt-5; }
+.grass-sway.amp-5 { animation-name: grass-5; }
+.grass-sway.sway-alt.amp-5 { animation-name: grass-alt-5; }
+.leaf-sway.amp-6 { animation-name: breeze-6; }
+.leaf-sway.sway-alt.amp-6 { animation-name: breeze-alt-6; }
+.grass-sway.amp-6 { animation-name: grass-6; }
+.grass-sway.sway-alt.amp-6 { animation-name: grass-alt-6; }
+.leaf-sway.amp-7 { animation-name: breeze-7; }
+.leaf-sway.sway-alt.amp-7 { animation-name: breeze-alt-7; }
+.grass-sway.amp-7 { animation-name: grass-7; }
+.grass-sway.sway-alt.amp-7 { animation-name: grass-alt-7; }
 .card-sway {
   animation: swing var(--dur, 30s) ease-in-out var(--delay, 0s) infinite;
   will-change: transform;
 }
-@keyframes breeze {
-  0%, 100% { transform: rotate(calc(var(--amp, 1deg) * -0.3)); }
-  7% { transform: rotate(var(--amp, 1deg)); }
-  12% { transform: rotate(calc(var(--amp, 1deg) * 0.45)); }
-  19% { transform: rotate(calc(var(--amp, 1deg) * 0.85)); }
-  26% { transform: rotate(calc(var(--amp, 1deg) * 0.1)); }
-  33% { transform: rotate(calc(var(--amp, 1deg) * 0.7)); }
-  41% { transform: rotate(calc(var(--amp, 1deg) * -0.2)); }
-  49% { transform: rotate(calc(var(--amp, 1deg) * 0.95)); }
-  55% { transform: rotate(calc(var(--amp, 1deg) * 0.35)); }
-  62% { transform: rotate(calc(var(--amp, 1deg) * 0.75)); }
-  70% { transform: rotate(calc(var(--amp, 1deg) * -0.1)); }
-  78% { transform: rotate(calc(var(--amp, 1deg) * 0.6)); }
-  84% { transform: rotate(calc(var(--amp, 1deg) * 0.2)); }
-  92% { transform: rotate(calc(var(--amp, 1deg) * 0.9)); }
+@keyframes breeze-0 {
+  0%, 100% { transform: rotate(-0.18deg); }
+  7% { transform: rotate(0.6deg); }
+  12% { transform: rotate(0.27deg); }
+  19% { transform: rotate(0.51deg); }
+  26% { transform: rotate(0.06deg); }
+  33% { transform: rotate(0.42deg); }
+  41% { transform: rotate(-0.12deg); }
+  49% { transform: rotate(0.57deg); }
+  55% { transform: rotate(0.21deg); }
+  62% { transform: rotate(0.45deg); }
+  70% { transform: rotate(-0.06deg); }
+  78% { transform: rotate(0.36deg); }
+  84% { transform: rotate(0.12deg); }
+  92% { transform: rotate(0.54deg); }
 }
-@keyframes breeze-alt {
-  0%, 100% { transform: rotate(calc(var(--amp, 1deg) * 0.2)); }
-  6% { transform: rotate(calc(var(--amp, 1deg) * 0.8)); }
-  14% { transform: rotate(calc(var(--amp, 1deg) * -0.25)); }
-  22% { transform: rotate(var(--amp, 1deg)); }
-  28% { transform: rotate(calc(var(--amp, 1deg) * 0.4)); }
-  37% { transform: rotate(calc(var(--amp, 1deg) * 0.65)); }
-  45% { transform: rotate(calc(var(--amp, 1deg) * -0.3)); }
-  52% { transform: rotate(calc(var(--amp, 1deg) * 0.55)); }
-  60% { transform: rotate(calc(var(--amp, 1deg) * 0.15)); }
-  69% { transform: rotate(calc(var(--amp, 1deg) * 0.9)); }
-  76% { transform: rotate(calc(var(--amp, 1deg) * 0.3)); }
-  85% { transform: rotate(calc(var(--amp, 1deg) * 0.7)); }
-  93% { transform: rotate(calc(var(--amp, 1deg) * -0.15)); }
+@keyframes breeze-1 {
+  0%, 100% { transform: rotate(-0.3deg); }
+  7% { transform: rotate(1.0deg); }
+  12% { transform: rotate(0.45deg); }
+  19% { transform: rotate(0.85deg); }
+  26% { transform: rotate(0.1deg); }
+  33% { transform: rotate(0.7deg); }
+  41% { transform: rotate(-0.2deg); }
+  49% { transform: rotate(0.95deg); }
+  55% { transform: rotate(0.35deg); }
+  62% { transform: rotate(0.75deg); }
+  70% { transform: rotate(-0.1deg); }
+  78% { transform: rotate(0.6deg); }
+  84% { transform: rotate(0.2deg); }
+  92% { transform: rotate(0.9deg); }
 }
-@keyframes grass {
-  0%, 100% { transform: skewX(calc(var(--amp, 1deg) * -0.3)); }
-  7% { transform: skewX(var(--amp, 1deg)); }
-  12% { transform: skewX(calc(var(--amp, 1deg) * 0.45)); }
-  19% { transform: skewX(calc(var(--amp, 1deg) * 0.85)); }
-  26% { transform: skewX(calc(var(--amp, 1deg) * 0.1)); }
-  33% { transform: skewX(calc(var(--amp, 1deg) * 0.7)); }
-  41% { transform: skewX(calc(var(--amp, 1deg) * -0.2)); }
-  49% { transform: skewX(calc(var(--amp, 1deg) * 0.95)); }
-  55% { transform: skewX(calc(var(--amp, 1deg) * 0.35)); }
-  62% { transform: skewX(calc(var(--amp, 1deg) * 0.75)); }
-  70% { transform: skewX(calc(var(--amp, 1deg) * -0.1)); }
-  78% { transform: skewX(calc(var(--amp, 1deg) * 0.6)); }
-  84% { transform: skewX(calc(var(--amp, 1deg) * 0.2)); }
-  92% { transform: skewX(calc(var(--amp, 1deg) * 0.9)); }
+@keyframes breeze-2 {
+  0%, 100% { transform: rotate(-0.45deg); }
+  7% { transform: rotate(1.5deg); }
+  12% { transform: rotate(0.675deg); }
+  19% { transform: rotate(1.275deg); }
+  26% { transform: rotate(0.15deg); }
+  33% { transform: rotate(1.05deg); }
+  41% { transform: rotate(-0.3deg); }
+  49% { transform: rotate(1.425deg); }
+  55% { transform: rotate(0.525deg); }
+  62% { transform: rotate(1.125deg); }
+  70% { transform: rotate(-0.15deg); }
+  78% { transform: rotate(0.9deg); }
+  84% { transform: rotate(0.3deg); }
+  92% { transform: rotate(1.35deg); }
 }
-@keyframes grass-alt {
-  0%, 100% { transform: skewX(calc(var(--amp, 1deg) * 0.2)); }
-  6% { transform: skewX(calc(var(--amp, 1deg) * 0.8)); }
-  14% { transform: skewX(calc(var(--amp, 1deg) * -0.25)); }
-  22% { transform: skewX(var(--amp, 1deg)); }
-  28% { transform: skewX(calc(var(--amp, 1deg) * 0.4)); }
-  37% { transform: skewX(calc(var(--amp, 1deg) * 0.65)); }
-  45% { transform: skewX(calc(var(--amp, 1deg) * -0.3)); }
-  52% { transform: skewX(calc(var(--amp, 1deg) * 0.55)); }
-  60% { transform: skewX(calc(var(--amp, 1deg) * 0.15)); }
-  69% { transform: skewX(calc(var(--amp, 1deg) * 0.9)); }
-  76% { transform: skewX(calc(var(--amp, 1deg) * 0.3)); }
-  85% { transform: skewX(calc(var(--amp, 1deg) * 0.7)); }
-  93% { transform: skewX(calc(var(--amp, 1deg) * -0.15)); }
+@keyframes breeze-3 {
+  0%, 100% { transform: rotate(-0.66deg); }
+  7% { transform: rotate(2.2deg); }
+  12% { transform: rotate(0.99deg); }
+  19% { transform: rotate(1.87deg); }
+  26% { transform: rotate(0.22deg); }
+  33% { transform: rotate(1.54deg); }
+  41% { transform: rotate(-0.44deg); }
+  49% { transform: rotate(2.09deg); }
+  55% { transform: rotate(0.77deg); }
+  62% { transform: rotate(1.65deg); }
+  70% { transform: rotate(-0.22deg); }
+  78% { transform: rotate(1.32deg); }
+  84% { transform: rotate(0.44deg); }
+  92% { transform: rotate(1.98deg); }
+}
+@keyframes breeze-4 {
+  0%, 100% { transform: rotate(-0.9deg); }
+  7% { transform: rotate(3.0deg); }
+  12% { transform: rotate(1.35deg); }
+  19% { transform: rotate(2.55deg); }
+  26% { transform: rotate(0.3deg); }
+  33% { transform: rotate(2.1deg); }
+  41% { transform: rotate(-0.6deg); }
+  49% { transform: rotate(2.85deg); }
+  55% { transform: rotate(1.05deg); }
+  62% { transform: rotate(2.25deg); }
+  70% { transform: rotate(-0.3deg); }
+  78% { transform: rotate(1.8deg); }
+  84% { transform: rotate(0.6deg); }
+  92% { transform: rotate(2.7deg); }
+}
+@keyframes breeze-5 {
+  0%, 100% { transform: rotate(-1.2deg); }
+  7% { transform: rotate(4.0deg); }
+  12% { transform: rotate(1.8deg); }
+  19% { transform: rotate(3.4deg); }
+  26% { transform: rotate(0.4deg); }
+  33% { transform: rotate(2.8deg); }
+  41% { transform: rotate(-0.8deg); }
+  49% { transform: rotate(3.8deg); }
+  55% { transform: rotate(1.4deg); }
+  62% { transform: rotate(3.0deg); }
+  70% { transform: rotate(-0.4deg); }
+  78% { transform: rotate(2.4deg); }
+  84% { transform: rotate(0.8deg); }
+  92% { transform: rotate(3.6deg); }
+}
+@keyframes breeze-6 {
+  0%, 100% { transform: rotate(-1.65deg); }
+  7% { transform: rotate(5.5deg); }
+  12% { transform: rotate(2.475deg); }
+  19% { transform: rotate(4.675deg); }
+  26% { transform: rotate(0.55deg); }
+  33% { transform: rotate(3.85deg); }
+  41% { transform: rotate(-1.1deg); }
+  49% { transform: rotate(5.225deg); }
+  55% { transform: rotate(1.925deg); }
+  62% { transform: rotate(4.125deg); }
+  70% { transform: rotate(-0.55deg); }
+  78% { transform: rotate(3.3deg); }
+  84% { transform: rotate(1.1deg); }
+  92% { transform: rotate(4.95deg); }
+}
+@keyframes breeze-7 {
+  0%, 100% { transform: rotate(-2.25deg); }
+  7% { transform: rotate(7.5deg); }
+  12% { transform: rotate(3.375deg); }
+  19% { transform: rotate(6.375deg); }
+  26% { transform: rotate(0.75deg); }
+  33% { transform: rotate(5.25deg); }
+  41% { transform: rotate(-1.5deg); }
+  49% { transform: rotate(7.125deg); }
+  55% { transform: rotate(2.625deg); }
+  62% { transform: rotate(5.625deg); }
+  70% { transform: rotate(-0.75deg); }
+  78% { transform: rotate(4.5deg); }
+  84% { transform: rotate(1.5deg); }
+  92% { transform: rotate(6.75deg); }
+}
+@keyframes breeze-alt-0 {
+  0%, 100% { transform: rotate(0.12deg); }
+  6% { transform: rotate(0.48deg); }
+  14% { transform: rotate(-0.15deg); }
+  22% { transform: rotate(0.6deg); }
+  28% { transform: rotate(0.24deg); }
+  37% { transform: rotate(0.39deg); }
+  45% { transform: rotate(-0.18deg); }
+  52% { transform: rotate(0.33deg); }
+  60% { transform: rotate(0.09deg); }
+  69% { transform: rotate(0.54deg); }
+  76% { transform: rotate(0.18deg); }
+  85% { transform: rotate(0.42deg); }
+  93% { transform: rotate(-0.09deg); }
+}
+@keyframes breeze-alt-1 {
+  0%, 100% { transform: rotate(0.2deg); }
+  6% { transform: rotate(0.8deg); }
+  14% { transform: rotate(-0.25deg); }
+  22% { transform: rotate(1.0deg); }
+  28% { transform: rotate(0.4deg); }
+  37% { transform: rotate(0.65deg); }
+  45% { transform: rotate(-0.3deg); }
+  52% { transform: rotate(0.55deg); }
+  60% { transform: rotate(0.15deg); }
+  69% { transform: rotate(0.9deg); }
+  76% { transform: rotate(0.3deg); }
+  85% { transform: rotate(0.7deg); }
+  93% { transform: rotate(-0.15deg); }
+}
+@keyframes breeze-alt-2 {
+  0%, 100% { transform: rotate(0.3deg); }
+  6% { transform: rotate(1.2deg); }
+  14% { transform: rotate(-0.375deg); }
+  22% { transform: rotate(1.5deg); }
+  28% { transform: rotate(0.6deg); }
+  37% { transform: rotate(0.975deg); }
+  45% { transform: rotate(-0.45deg); }
+  52% { transform: rotate(0.825deg); }
+  60% { transform: rotate(0.225deg); }
+  69% { transform: rotate(1.35deg); }
+  76% { transform: rotate(0.45deg); }
+  85% { transform: rotate(1.05deg); }
+  93% { transform: rotate(-0.225deg); }
+}
+@keyframes breeze-alt-3 {
+  0%, 100% { transform: rotate(0.44deg); }
+  6% { transform: rotate(1.76deg); }
+  14% { transform: rotate(-0.55deg); }
+  22% { transform: rotate(2.2deg); }
+  28% { transform: rotate(0.88deg); }
+  37% { transform: rotate(1.43deg); }
+  45% { transform: rotate(-0.66deg); }
+  52% { transform: rotate(1.21deg); }
+  60% { transform: rotate(0.33deg); }
+  69% { transform: rotate(1.98deg); }
+  76% { transform: rotate(0.66deg); }
+  85% { transform: rotate(1.54deg); }
+  93% { transform: rotate(-0.33deg); }
+}
+@keyframes breeze-alt-4 {
+  0%, 100% { transform: rotate(0.6deg); }
+  6% { transform: rotate(2.4deg); }
+  14% { transform: rotate(-0.75deg); }
+  22% { transform: rotate(3.0deg); }
+  28% { transform: rotate(1.2deg); }
+  37% { transform: rotate(1.95deg); }
+  45% { transform: rotate(-0.9deg); }
+  52% { transform: rotate(1.65deg); }
+  60% { transform: rotate(0.45deg); }
+  69% { transform: rotate(2.7deg); }
+  76% { transform: rotate(0.9deg); }
+  85% { transform: rotate(2.1deg); }
+  93% { transform: rotate(-0.45deg); }
+}
+@keyframes breeze-alt-5 {
+  0%, 100% { transform: rotate(0.8deg); }
+  6% { transform: rotate(3.2deg); }
+  14% { transform: rotate(-1.0deg); }
+  22% { transform: rotate(4.0deg); }
+  28% { transform: rotate(1.6deg); }
+  37% { transform: rotate(2.6deg); }
+  45% { transform: rotate(-1.2deg); }
+  52% { transform: rotate(2.2deg); }
+  60% { transform: rotate(0.6deg); }
+  69% { transform: rotate(3.6deg); }
+  76% { transform: rotate(1.2deg); }
+  85% { transform: rotate(2.8deg); }
+  93% { transform: rotate(-0.6deg); }
+}
+@keyframes breeze-alt-6 {
+  0%, 100% { transform: rotate(1.1deg); }
+  6% { transform: rotate(4.4deg); }
+  14% { transform: rotate(-1.375deg); }
+  22% { transform: rotate(5.5deg); }
+  28% { transform: rotate(2.2deg); }
+  37% { transform: rotate(3.575deg); }
+  45% { transform: rotate(-1.65deg); }
+  52% { transform: rotate(3.025deg); }
+  60% { transform: rotate(0.825deg); }
+  69% { transform: rotate(4.95deg); }
+  76% { transform: rotate(1.65deg); }
+  85% { transform: rotate(3.85deg); }
+  93% { transform: rotate(-0.825deg); }
+}
+@keyframes breeze-alt-7 {
+  0%, 100% { transform: rotate(1.5deg); }
+  6% { transform: rotate(6.0deg); }
+  14% { transform: rotate(-1.875deg); }
+  22% { transform: rotate(7.5deg); }
+  28% { transform: rotate(3.0deg); }
+  37% { transform: rotate(4.875deg); }
+  45% { transform: rotate(-2.25deg); }
+  52% { transform: rotate(4.125deg); }
+  60% { transform: rotate(1.125deg); }
+  69% { transform: rotate(6.75deg); }
+  76% { transform: rotate(2.25deg); }
+  85% { transform: rotate(5.25deg); }
+  93% { transform: rotate(-1.125deg); }
+}
+@keyframes grass-0 {
+  0%, 100% { transform: skewX(-0.18deg); }
+  7% { transform: skewX(0.6deg); }
+  12% { transform: skewX(0.27deg); }
+  19% { transform: skewX(0.51deg); }
+  26% { transform: skewX(0.06deg); }
+  33% { transform: skewX(0.42deg); }
+  41% { transform: skewX(-0.12deg); }
+  49% { transform: skewX(0.57deg); }
+  55% { transform: skewX(0.21deg); }
+  62% { transform: skewX(0.45deg); }
+  70% { transform: skewX(-0.06deg); }
+  78% { transform: skewX(0.36deg); }
+  84% { transform: skewX(0.12deg); }
+  92% { transform: skewX(0.54deg); }
+}
+@keyframes grass-1 {
+  0%, 100% { transform: skewX(-0.3deg); }
+  7% { transform: skewX(1.0deg); }
+  12% { transform: skewX(0.45deg); }
+  19% { transform: skewX(0.85deg); }
+  26% { transform: skewX(0.1deg); }
+  33% { transform: skewX(0.7deg); }
+  41% { transform: skewX(-0.2deg); }
+  49% { transform: skewX(0.95deg); }
+  55% { transform: skewX(0.35deg); }
+  62% { transform: skewX(0.75deg); }
+  70% { transform: skewX(-0.1deg); }
+  78% { transform: skewX(0.6deg); }
+  84% { transform: skewX(0.2deg); }
+  92% { transform: skewX(0.9deg); }
+}
+@keyframes grass-2 {
+  0%, 100% { transform: skewX(-0.45deg); }
+  7% { transform: skewX(1.5deg); }
+  12% { transform: skewX(0.675deg); }
+  19% { transform: skewX(1.275deg); }
+  26% { transform: skewX(0.15deg); }
+  33% { transform: skewX(1.05deg); }
+  41% { transform: skewX(-0.3deg); }
+  49% { transform: skewX(1.425deg); }
+  55% { transform: skewX(0.525deg); }
+  62% { transform: skewX(1.125deg); }
+  70% { transform: skewX(-0.15deg); }
+  78% { transform: skewX(0.9deg); }
+  84% { transform: skewX(0.3deg); }
+  92% { transform: skewX(1.35deg); }
+}
+@keyframes grass-3 {
+  0%, 100% { transform: skewX(-0.66deg); }
+  7% { transform: skewX(2.2deg); }
+  12% { transform: skewX(0.99deg); }
+  19% { transform: skewX(1.87deg); }
+  26% { transform: skewX(0.22deg); }
+  33% { transform: skewX(1.54deg); }
+  41% { transform: skewX(-0.44deg); }
+  49% { transform: skewX(2.09deg); }
+  55% { transform: skewX(0.77deg); }
+  62% { transform: skewX(1.65deg); }
+  70% { transform: skewX(-0.22deg); }
+  78% { transform: skewX(1.32deg); }
+  84% { transform: skewX(0.44deg); }
+  92% { transform: skewX(1.98deg); }
+}
+@keyframes grass-4 {
+  0%, 100% { transform: skewX(-0.9deg); }
+  7% { transform: skewX(3.0deg); }
+  12% { transform: skewX(1.35deg); }
+  19% { transform: skewX(2.55deg); }
+  26% { transform: skewX(0.3deg); }
+  33% { transform: skewX(2.1deg); }
+  41% { transform: skewX(-0.6deg); }
+  49% { transform: skewX(2.85deg); }
+  55% { transform: skewX(1.05deg); }
+  62% { transform: skewX(2.25deg); }
+  70% { transform: skewX(-0.3deg); }
+  78% { transform: skewX(1.8deg); }
+  84% { transform: skewX(0.6deg); }
+  92% { transform: skewX(2.7deg); }
+}
+@keyframes grass-5 {
+  0%, 100% { transform: skewX(-1.2deg); }
+  7% { transform: skewX(4.0deg); }
+  12% { transform: skewX(1.8deg); }
+  19% { transform: skewX(3.4deg); }
+  26% { transform: skewX(0.4deg); }
+  33% { transform: skewX(2.8deg); }
+  41% { transform: skewX(-0.8deg); }
+  49% { transform: skewX(3.8deg); }
+  55% { transform: skewX(1.4deg); }
+  62% { transform: skewX(3.0deg); }
+  70% { transform: skewX(-0.4deg); }
+  78% { transform: skewX(2.4deg); }
+  84% { transform: skewX(0.8deg); }
+  92% { transform: skewX(3.6deg); }
+}
+@keyframes grass-6 {
+  0%, 100% { transform: skewX(-1.65deg); }
+  7% { transform: skewX(5.5deg); }
+  12% { transform: skewX(2.475deg); }
+  19% { transform: skewX(4.675deg); }
+  26% { transform: skewX(0.55deg); }
+  33% { transform: skewX(3.85deg); }
+  41% { transform: skewX(-1.1deg); }
+  49% { transform: skewX(5.225deg); }
+  55% { transform: skewX(1.925deg); }
+  62% { transform: skewX(4.125deg); }
+  70% { transform: skewX(-0.55deg); }
+  78% { transform: skewX(3.3deg); }
+  84% { transform: skewX(1.1deg); }
+  92% { transform: skewX(4.95deg); }
+}
+@keyframes grass-7 {
+  0%, 100% { transform: skewX(-2.25deg); }
+  7% { transform: skewX(7.5deg); }
+  12% { transform: skewX(3.375deg); }
+  19% { transform: skewX(6.375deg); }
+  26% { transform: skewX(0.75deg); }
+  33% { transform: skewX(5.25deg); }
+  41% { transform: skewX(-1.5deg); }
+  49% { transform: skewX(7.125deg); }
+  55% { transform: skewX(2.625deg); }
+  62% { transform: skewX(5.625deg); }
+  70% { transform: skewX(-0.75deg); }
+  78% { transform: skewX(4.5deg); }
+  84% { transform: skewX(1.5deg); }
+  92% { transform: skewX(6.75deg); }
+}
+@keyframes grass-alt-0 {
+  0%, 100% { transform: skewX(0.12deg); }
+  6% { transform: skewX(0.48deg); }
+  14% { transform: skewX(-0.15deg); }
+  22% { transform: skewX(0.6deg); }
+  28% { transform: skewX(0.24deg); }
+  37% { transform: skewX(0.39deg); }
+  45% { transform: skewX(-0.18deg); }
+  52% { transform: skewX(0.33deg); }
+  60% { transform: skewX(0.09deg); }
+  69% { transform: skewX(0.54deg); }
+  76% { transform: skewX(0.18deg); }
+  85% { transform: skewX(0.42deg); }
+  93% { transform: skewX(-0.09deg); }
+}
+@keyframes grass-alt-1 {
+  0%, 100% { transform: skewX(0.2deg); }
+  6% { transform: skewX(0.8deg); }
+  14% { transform: skewX(-0.25deg); }
+  22% { transform: skewX(1.0deg); }
+  28% { transform: skewX(0.4deg); }
+  37% { transform: skewX(0.65deg); }
+  45% { transform: skewX(-0.3deg); }
+  52% { transform: skewX(0.55deg); }
+  60% { transform: skewX(0.15deg); }
+  69% { transform: skewX(0.9deg); }
+  76% { transform: skewX(0.3deg); }
+  85% { transform: skewX(0.7deg); }
+  93% { transform: skewX(-0.15deg); }
+}
+@keyframes grass-alt-2 {
+  0%, 100% { transform: skewX(0.3deg); }
+  6% { transform: skewX(1.2deg); }
+  14% { transform: skewX(-0.375deg); }
+  22% { transform: skewX(1.5deg); }
+  28% { transform: skewX(0.6deg); }
+  37% { transform: skewX(0.975deg); }
+  45% { transform: skewX(-0.45deg); }
+  52% { transform: skewX(0.825deg); }
+  60% { transform: skewX(0.225deg); }
+  69% { transform: skewX(1.35deg); }
+  76% { transform: skewX(0.45deg); }
+  85% { transform: skewX(1.05deg); }
+  93% { transform: skewX(-0.225deg); }
+}
+@keyframes grass-alt-3 {
+  0%, 100% { transform: skewX(0.44deg); }
+  6% { transform: skewX(1.76deg); }
+  14% { transform: skewX(-0.55deg); }
+  22% { transform: skewX(2.2deg); }
+  28% { transform: skewX(0.88deg); }
+  37% { transform: skewX(1.43deg); }
+  45% { transform: skewX(-0.66deg); }
+  52% { transform: skewX(1.21deg); }
+  60% { transform: skewX(0.33deg); }
+  69% { transform: skewX(1.98deg); }
+  76% { transform: skewX(0.66deg); }
+  85% { transform: skewX(1.54deg); }
+  93% { transform: skewX(-0.33deg); }
+}
+@keyframes grass-alt-4 {
+  0%, 100% { transform: skewX(0.6deg); }
+  6% { transform: skewX(2.4deg); }
+  14% { transform: skewX(-0.75deg); }
+  22% { transform: skewX(3.0deg); }
+  28% { transform: skewX(1.2deg); }
+  37% { transform: skewX(1.95deg); }
+  45% { transform: skewX(-0.9deg); }
+  52% { transform: skewX(1.65deg); }
+  60% { transform: skewX(0.45deg); }
+  69% { transform: skewX(2.7deg); }
+  76% { transform: skewX(0.9deg); }
+  85% { transform: skewX(2.1deg); }
+  93% { transform: skewX(-0.45deg); }
+}
+@keyframes grass-alt-5 {
+  0%, 100% { transform: skewX(0.8deg); }
+  6% { transform: skewX(3.2deg); }
+  14% { transform: skewX(-1.0deg); }
+  22% { transform: skewX(4.0deg); }
+  28% { transform: skewX(1.6deg); }
+  37% { transform: skewX(2.6deg); }
+  45% { transform: skewX(-1.2deg); }
+  52% { transform: skewX(2.2deg); }
+  60% { transform: skewX(0.6deg); }
+  69% { transform: skewX(3.6deg); }
+  76% { transform: skewX(1.2deg); }
+  85% { transform: skewX(2.8deg); }
+  93% { transform: skewX(-0.6deg); }
+}
+@keyframes grass-alt-6 {
+  0%, 100% { transform: skewX(1.1deg); }
+  6% { transform: skewX(4.4deg); }
+  14% { transform: skewX(-1.375deg); }
+  22% { transform: skewX(5.5deg); }
+  28% { transform: skewX(2.2deg); }
+  37% { transform: skewX(3.575deg); }
+  45% { transform: skewX(-1.65deg); }
+  52% { transform: skewX(3.025deg); }
+  60% { transform: skewX(0.825deg); }
+  69% { transform: skewX(4.95deg); }
+  76% { transform: skewX(1.65deg); }
+  85% { transform: skewX(3.85deg); }
+  93% { transform: skewX(-0.825deg); }
+}
+@keyframes grass-alt-7 {
+  0%, 100% { transform: skewX(1.5deg); }
+  6% { transform: skewX(6.0deg); }
+  14% { transform: skewX(-1.875deg); }
+  22% { transform: skewX(7.5deg); }
+  28% { transform: skewX(3.0deg); }
+  37% { transform: skewX(4.875deg); }
+  45% { transform: skewX(-2.25deg); }
+  52% { transform: skewX(4.125deg); }
+  60% { transform: skewX(1.125deg); }
+  69% { transform: skewX(6.75deg); }
+  76% { transform: skewX(2.25deg); }
+  85% { transform: skewX(5.25deg); }
+  93% { transform: skewX(-1.125deg); }
 }
 @keyframes swing {
   0%, 100% { transform: rotate(calc(var(--amp, 1deg) * -0.6)); }
@@ -559,11 +1033,141 @@
   100% { opacity: 0; }
 }
 
-/* off screen, the breeze holds still and costs nothing */
+/* The trailing cursor ring (Cursor.tsx): a thin ink circle that fills with
+   a little jade over anything clickable. */
+.cursor-ring {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 100;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--foreground) 45%, transparent);
+  background: transparent;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+.cursor-ring[data-hot="1"] {
+  border-color: color-mix(in oklab, var(--accent) 70%, transparent);
+  background: color-mix(in oklab, var(--accent) 12%, transparent);
+}
+
+/* ---------------------------------------------------------------- */
+/* Below the hero: quiet motion (Ambient.tsx)                       */
+/* ---------------------------------------------------------------- */
+
+/* Ambient loops run only while their section is on screen (data-live is
+   set by the section as it enters and leaves the viewport). */
+.ambient {
+  animation-play-state: paused !important;
+}
+[data-live="true"] .ambient {
+  animation-play-state: running !important;
+}
+
+/* sunlight through leaves, drifting over the wall */
+.leaf-light {
+  animation: leaf-drift 30s ease-in-out infinite alternate;
+}
+@keyframes leaf-drift {
+  from { transform: translate(-3%, 2%) rotate(-2deg) scale(1.02); }
+  to { transform: translate(3%, -2%) rotate(2deg) scale(1.06); }
+}
+
+/* grass at the foot of the page leans from its roots */
+.grass-a,
+.grass-b {
+  transform-origin: 50% 100%;
+  will-change: transform;
+  animation: grass-lean 5.6s ease-in-out infinite alternate;
+}
+.grass-b {
+  animation-duration: 7.3s;
+  animation-delay: -2.4s;
+}
+@keyframes grass-lean {
+  from { transform: skewX(-4deg); }
+  to { transform: skewX(3deg); }
+}
+
+/* the record in the Music picture turns while it is on screen */
+.spin-record {
+  will-change: transform;
+  animation: spin 10s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* the contribution graph fills in, week by week, the first time it is seen */
+.contrib-grow .contrib-col {
+  animation: contrib-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--c) * 12ms);
+}
+@keyframes contrib-in {
+  from { opacity: 0; transform: translateY(4px); }
+}
+
+/* One-time entrances (useReveal.ts): cards settle into place, and the
+   Path's vine grows across the stages, the first time each is seen. */
+.reveal-ready .reveal:not(.is-in) {
+  opacity: 0;
+  transform: translateY(18px);
+}
+.reveal-ready .reveal {
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+.reveal-ready .vine:not(.is-in) .vine-stem {
+  stroke-dashoffset: 1;
+}
+.vine-stem {
+  stroke-dasharray: 1;
+  transition: stroke-dashoffset 1.8s cubic-bezier(0.45, 0, 0.25, 1);
+}
+.reveal-ready .vine:not(.is-in) .vine-leaf-g {
+  transform: scale(0) rotate(-30deg);
+  opacity: 0;
+}
+.vine-leaf-g {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition:
+    transform 0.6s cubic-bezier(0.34, 1.4, 0.64, 1),
+    opacity 0.4s ease;
+  transition-delay: calc(0.35s + var(--i) * 0.55s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient,
+  .contrib-grow .contrib-col {
+    animation: none !important;
+  }
+  /* no reveal either: the scene is simply there */
+  .scene-veil,
+  .scene-glow {
+    display: none;
+  }
+}
+
+/* Off screen, the breeze holds still and the tree costs nothing: its many
+   layers leave the GPU and the browser skips the scene entirely (the saved
+   bitmaps stay in the page, so it is back at once on return). */
 .hero-still .leaf-sway,
 .hero-still .grass-sway,
 .hero-still .card-sway {
   animation-play-state: paused;
+  will-change: auto;
+}
+.hero-still .scene-frame {
+  content-visibility: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {
