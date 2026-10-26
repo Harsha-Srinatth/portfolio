@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { AudioLines, Camera, Code2, GraduationCap, Headphones, Play, UtensilsCrossed } from "lucide-react";
+import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
+import { AudioLines, Camera, Code2, Headphones, Heart, Pause, Play, UtensilsCrossed } from "lucide-react";
 
 import { PERSON } from "@/components/portfolio/data";
+import { readLiked, sendLike, subscribeLiked } from "../likeStore";
+import { toast } from "../toastStore";
 import { HANGERS, VIEW, limbAt, sceneUnit as u, type Hanger } from "./treeArt";
 
 /*
@@ -15,7 +17,7 @@ type HangerKey = keyof typeof HANGERS;
 const SWAY: Record<HangerKey, { dur: number; delay: number; amp: number }> = {
   music: { dur: 29, delay: -5, amp: 1.1 },
   profile: { dur: 34, delay: -17, amp: 0.8 },
-  about: { dur: 26, delay: -11, amp: 1.3 },
+  like: { dur: 26, delay: -11, amp: 1.3 },
 };
 
 function swayVars(key: HangerKey): CSSProperties {
@@ -31,21 +33,52 @@ const paper =
   "rounded-[1.05em] border border-[var(--card-paper-border)] bg-[var(--card-paper)] text-[var(--card-paper-fg)] shadow-[var(--card-shadow)]";
 
 function Index({ n }: { n: string }) {
-  return <span className="text-[0.78em] tabular-nums opacity-60">{n}</span>;
+  return <span className="text-[0.85em] tabular-nums opacity-70">{n}</span>;
 }
 
-function Waveform() {
-  const bars = [3, 6, 4, 8, 5, 9, 6, 4, 7, 10, 6, 8, 4, 6, 9, 5, 7, 4, 6, 3];
+/** A sine curve, two periods wide, for the waves to slide along. */
+function sine(amp: number, periods: number, phase: number) {
+  const w = 200;
+  const pts: string[] = [];
+  for (let i = 0; i <= 120; i++) {
+    const x = (i / 120) * w;
+    pts.push(`${x.toFixed(1)} ${(20 + Math.sin((x / w) * Math.PI * 2 * periods + phase) * amp).toFixed(2)}`);
+  }
+  return `M${pts.join("L")}`;
+}
+
+/** Three layered waves in a strip: they slide, and swell and ebb, while playing. */
+function Waves({ playing }: { playing: boolean }) {
+  const layers = [
+    { amp: 13, periods: 2, phase: 0, o: 0.95, w: 1.8, speed: 3.2, swell: "0s" },
+    { amp: 9, periods: 3, phase: 1.6, o: 0.6, w: 1.4, speed: 4.6, swell: "-0.7s" },
+    { amp: 6, periods: 4, phase: 3.1, o: 0.38, w: 1.2, speed: 6.1, swell: "-1.3s" },
+  ];
+  const state = playing ? "running" : "paused";
   return (
-    <span className="mt-[0.5em] flex h-[1em] items-end gap-[0.14em]" aria-hidden>
-      {bars.map((b, i) => (
-        <span key={i} className="w-[0.12em] rounded-full bg-current opacity-70" style={{ height: `${b * 10}%` }} />
+    <div className="wave-field relative min-h-[2.6em] flex-1 overflow-hidden" style={{ opacity: playing ? 1 : 0 }} aria-hidden>
+      {layers.map((l, i) => (
+        <div key={i} className="wave-swell absolute inset-0" style={{ animationDelay: l.swell, animationPlayState: state }}>
+          <div className="wave flex h-full w-[200%]" style={{ ["--wd" as string]: `${l.speed}s`, animationPlayState: state }}>
+            {[0, 1].map((k) => (
+              <svg key={k} viewBox="0 0 200 40" preserveAspectRatio="none" className="h-full w-1/2">
+                <path d={sine(l.amp, l.periods, l.phase)} fill="none" stroke="currentColor" strokeOpacity={l.o} strokeWidth={l.w} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+              </svg>
+            ))}
+          </div>
+        </div>
       ))}
-    </span>
+    </div>
   );
 }
 
 export function MusicCard() {
+  const [playing, setPlaying] = useState(false);
+  const toggle = () => {
+    // there is no track yet: the button only shows what playing will look like
+    if (!playing) toast("Coming soon");
+    setPlaying((p) => !p);
+  };
   return (
     <article
       aria-label="Music"
@@ -53,31 +86,28 @@ export function MusicCard() {
       style={{ background: "linear-gradient(155deg, color-mix(in oklab, var(--card-dark) 82%, #a08a72) 0%, var(--card-dark) 45%, var(--card-dark-2) 100%)" }}
     >
       <div className="flex items-start justify-between">
-        <AudioLines className="h-[1.7em] w-[1.7em]" strokeWidth={1.4} aria-hidden />
+        <AudioLines className="h-[1.9em] w-[1.9em]" strokeWidth={1.5} aria-hidden />
         <Index n="01" />
       </div>
-      <h3 className="font-display mt-[0.75em] text-[1.75em] font-[400] leading-none tracking-[-0.02em]">Music</h3>
-      <p className="mt-[0.5em] text-[0.88em] leading-[1.38] opacity-85">
-        A constant companion that keeps me focused, creative and calm.
-      </p>
-      <div className="mt-auto flex items-center gap-[0.75em] border-t border-white/10 pt-[0.9em]">
-        <span
-          aria-hidden
-          className="h-[3.3em] w-[3.3em] shrink-0 rounded-[0.45em]"
-          style={{
-            background:
-              "radial-gradient(circle at 38% 62%, #ffd9a1 0 10%, transparent 11%), linear-gradient(180deg, #f2b06a 0%, #b9626a 48%, #4d3346 72%, #261d27 100%)",
-          }}
-        />
+      <h3 className="font-display mt-[0.6em] text-[1.9em] font-[420] leading-none tracking-[-0.02em]">Music</h3>
+      <p className="card-extra mt-[0.5em] text-[0.96em] leading-[1.35]">A constant companion that keeps me focused, creative and calm.</p>
+
+      <Waves playing={playing} />
+
+      <div className="mt-auto flex items-center gap-[0.8em] border-t border-white/15 pt-[0.85em]">
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-[0.7em] font-medium leading-tight">Lo-fi &amp; ambient</span>
-          <span className="block truncate text-[0.6em] leading-tight opacity-60">What I code to</span>
-          <Waveform />
+          <span className="block text-[1.12em] font-medium leading-tight">{PERSON.song.title}</span>
+          <span className="card-extra block truncate text-[0.88em] leading-tight opacity-80">{PERSON.song.note}</span>
         </span>
-        {/* decorative: the site has no audio player, so this is not a control */}
-        <span aria-hidden className="grid h-[2em] w-[2em] shrink-0 place-items-center rounded-full bg-[var(--card-dark-fg)] text-[var(--card-dark)]">
-          <Play className="ml-[0.1em] h-[0.85em] w-[0.85em]" fill="currentColor" strokeWidth={0} />
-        </span>
+        <button
+          type="button"
+          onClick={toggle}
+          aria-pressed={playing}
+          aria-label={playing ? "Pause" : "Play"}
+          className="grid h-[2.7em] w-[2.7em] shrink-0 place-items-center rounded-full bg-[var(--card-dark-fg)] text-[var(--card-dark)] transition-transform duration-200 hover:scale-105 active:scale-95"
+        >
+          {playing ? <Pause className="h-[1.05em] w-[1.05em]" fill="currentColor" strokeWidth={0} /> : <Play className="ml-[0.12em] h-[1.05em] w-[1.05em]" fill="currentColor" strokeWidth={0} />}
+        </button>
       </div>
     </article>
   );
@@ -87,7 +117,7 @@ const LIKE_ICONS = [Headphones, Code2, UtensilsCrossed, Camera];
 
 export function ProfileCard() {
   return (
-    <article aria-label="Things I like" className={`flex h-full flex-col p-[1.25em] ${paper}`}>
+    <article aria-label="My interests" className={`flex h-full flex-col p-[1.25em] ${paper}`}>
       <div className="flex items-start justify-between">
         <span className="font-display text-[1.75em] leading-none tracking-[-0.06em]" style={{ fontVariationSettings: '"opsz" 144' }}>
           HS
@@ -96,7 +126,20 @@ export function ProfileCard() {
       </div>
       <div className="mx-auto mt-[0.9em] h-[8.4em] w-[8.4em] shrink-0 overflow-hidden rounded-full border-[0.25em] border-[var(--card-paper)] shadow-[0_0.3em_0.9em_-0.3em_rgba(60,40,20,0.35)]">
         {PERSON.photo ? (
-          <img src={PERSON.photo} alt={PERSON.fullName} className="h-full w-full object-cover" />
+          <img
+            src={PERSON.photo}
+            alt={PERSON.fullName}
+            className="h-full w-full object-cover"
+            style={
+              PERSON.photoPosition
+                ? {
+                    objectPosition: PERSON.photoPosition,
+                    transform: `scale(${PERSON.photoScale ?? 1})`,
+                    transformOrigin: PERSON.photoPosition,
+                  }
+                : undefined
+            }
+          />
         ) : (
           <span
             role="img"
@@ -108,13 +151,13 @@ export function ProfileCard() {
           </span>
         )}
       </div>
-      <h3 className="font-display mt-[1em] text-[1.1em] font-[450]">My interests</h3>
-      <ul className="mt-[0.55em] space-y-[0.55em] text-[0.74em]">
+      <h3 className="font-display mt-[0.9em] text-[1.2em] font-[450] leading-tight">My interests</h3>
+      <ul className="mt-[0.45em] space-y-[0.4em] text-[0.84em] leading-tight">
         {PERSON.likes.map((like, i) => {
           const Icon = LIKE_ICONS[i % LIKE_ICONS.length];
           return (
-            <li key={like} className="flex items-center gap-[0.7em]">
-              <Icon className="h-[1.25em] w-[1.25em] shrink-0 opacity-80" strokeWidth={1.6} aria-hidden />
+            <li key={like} className={`flex items-center gap-[0.65em] ${i > 1 ? "card-extra" : ""}`}>
+              <Icon className="h-[1.25em] w-[1.25em] shrink-0" strokeWidth={1.7} aria-hidden />
               {like}
             </li>
           );
@@ -124,24 +167,40 @@ export function ProfileCard() {
   );
 }
 
-export function AboutCard() {
+/** A Like card: one tap sends a like (the same one as the footer's); the heart turns red. */
+export function LikeCard() {
+  const likedBefore = useSyncExternalStore(subscribeLiked, readLiked, () => false);
+  const [pending, setPending] = useState(false);
+  const liked = likedBefore;
+  const tap = async () => {
+    if (liked || pending) return;
+    setPending(true);
+    try {
+      await sendLike();
+    } catch (error) {
+      console.error("[stats] Failed to record like", error);
+      toast("Couldn’t send your like. Try again");
+    } finally {
+      setPending(false);
+    }
+  };
   return (
-    <article aria-label="About me" className={`flex h-full flex-col p-[1.35em] ${paper}`}>
-      <div className="flex items-start justify-between">
-        <span className="grid h-[2.6em] w-[2.6em] place-items-center rounded-[0.6em] bg-[var(--card-chip)]" aria-hidden>
-          <GraduationCap className="h-[1.45em] w-[1.45em]" strokeWidth={1.5} />
-        </span>
+    <article aria-label="Like" className={`flex h-full flex-col items-center p-[1.35em] text-center ${paper}`}>
+      <div className="flex w-full items-start justify-end">
         <Index n="03" />
       </div>
-      <h3 className="font-display mt-[0.8em] text-[1.75em] font-[400] leading-none tracking-[-0.02em]">About Me</h3>
-      <p className="mt-[0.6em] text-[0.88em] leading-[1.4] opacity-85">CSBS student at SRKR Engineering College, Bhimavaram.</p>
-      <ul className="mt-auto flex flex-wrap gap-[0.45em] pt-[0.8em] text-[0.66em]" aria-label="Tags">
-        {["CSBS", "SRKR", "Bhimavaram"].map((t) => (
-          <li key={t} className="rounded-full border border-[var(--card-paper-border)] bg-[var(--card-tag)] px-[0.95em] py-[0.4em]">
-            {t}
-          </li>
-        ))}
-      </ul>
+      <button
+        type="button"
+        onClick={() => void tap()}
+        disabled={liked || pending}
+        aria-pressed={liked}
+        aria-label={liked ? "You liked this site" : "Like this site"}
+        className="like-heart mt-[0.2em] grid h-[5.6em] w-[5.6em] place-items-center rounded-full bg-[var(--card-chip)] transition-transform duration-200 hover:scale-105 active:scale-95 disabled:cursor-default"
+      >
+        <Heart className={`h-[2.6em] w-[2.6em] transition-colors duration-300 ${liked ? "like-pop fill-[#e5384f] text-[#e5384f]" : ""}`} strokeWidth={1.6} aria-hidden />
+      </button>
+      <h3 className="font-display mt-[0.75em] text-[1.6em] font-[420] leading-tight">{liked ? "Thank you!" : "Liked it?"}</h3>
+      <p className="mt-[0.35em] text-[1em] leading-snug">{liked ? "Your like is counted." : "Tap the heart."}</p>
     </article>
   );
 }
@@ -149,7 +208,7 @@ export function AboutCard() {
 const FACES: Record<HangerKey, () => ReactNode> = {
   music: MusicCard,
   profile: ProfileCard,
-  about: AboutCard,
+  like: LikeCard,
 };
 
 /* ------------------------------------------------------------------ */
@@ -210,7 +269,7 @@ export function SceneCards() {
     <div className="pointer-events-auto">
       <SceneHanger k="music" h={HANGERS.music} />
       <SceneHanger k="profile" h={HANGERS.profile} />
-      <SceneHanger k="about" h={HANGERS.about} />
+      <SceneHanger k="like" h={HANGERS.like} />
     </div>
   );
 }
@@ -224,13 +283,15 @@ const stackUnit = (w: number, h: number) => Math.min(h / 1180, w / 980);
 /** The scene's left edge in the frame: the same as `left` in styles.css. */
 const stackLeft = (w: number, unit: number) => Math.max(0, (w - unit * 1220) * 0.6);
 
-const KEYS: HangerKey[] = ["music", "profile", "about"];
+const KEYS: HangerKey[] = ["music", "profile", "like"];
 /** Card size in desktop units, the limbs each may hang from, cord and tilt. */
 const COMPACT: Record<HangerKey, { w: number; h: number; limbs: string[]; cord: number; tilt: number }> = {
   music: { w: 240, h: 286, limbs: ["left", "lowLeft"], cord: 40, tilt: 0.6 },
   profile: { w: 228, h: 362, limbs: ["left", "rightUp", "lowLeft"], cord: 150, tilt: 0 },
-  about: { w: 248, h: 272, limbs: ["right", "rightUp"], cord: 110, tilt: -1.4 },
+  like: { w: 248, h: 272, limbs: ["right", "rightUp"], cord: 110, tilt: -1.4 },
 };
+/** Text on phones and tablets is set larger than the card's own scale, and the least important lines are left out (.card-extra). */
+const COMPACT_TEXT = 1;
 /** Leftmost scene x that still has foliage on the smaller layout (the fringe is hidden). */
 const TREE_LEFT = 640;
 
@@ -286,8 +347,8 @@ function CompactHanger({ p }: { p: Placed }) {
   const Face = FACES[p.k];
   return (
     <div
-      className="card-sway absolute"
-      style={{ left: p.left, top: p.top, width: p.w, height: p.cord + p.h, transformOrigin: "50% 0%", fontSize: 16 * p.scale, ...swayVars(p.k) }}
+      className="card-sway card-compact absolute"
+      style={{ left: p.left, top: p.top, width: p.w, height: p.cord + p.h, transformOrigin: "50% 0%", fontSize: 16 * p.scale * COMPACT_TEXT, ...swayVars(p.k) }}
     >
       <span
         aria-hidden

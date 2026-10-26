@@ -1,7 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Menu, Moon, Sun, X } from "lucide-react";
 
 import { setTheme, useTheme } from "@/lib/theme";
+
+/** Every section, in page order, for the phone menu. */
+const MENU = [
+  { href: "#about", label: "About" },
+  { href: "#constellation", label: "Work" },
+  { href: "#strata", label: "Path" },
+  { href: "#frequencies", label: "Skills" },
+  { href: "#achievements", label: "Achievements" },
+  { href: "#build-log", label: "Build log" },
+  { href: "#transmissions", label: "Contact" },
+];
 
 const NAV = [
   { href: "#about", label: "About" },
@@ -44,15 +55,22 @@ function ThemeToggle({ className = "" }: { className?: string }) {
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const opener = useRef<HTMLButtonElement>(null);
+  const closer = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!menuOpen) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
     window.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
+    const html = document.documentElement;
+    const before = html.style.overflow;
+    html.style.overflow = "hidden";
+    closer.current?.focus();
+    const button = opener.current;
     return () => {
       window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
+      html.style.overflow = before;
+      button?.focus({ preventScroll: true });
     };
   }, [menuOpen]);
 
@@ -82,6 +100,7 @@ export function Header() {
           {/* on phones the switch lives in the menu, to keep the bar uncrowded */}
           <ThemeToggle className="max-sm:hidden" />
           <button
+            ref={opener}
             type="button"
             onClick={() => setMenuOpen(true)}
             aria-label="Open menu"
@@ -94,36 +113,39 @@ export function Header() {
       </header>
 
       {menuOpen && (
-        <div className="fixed inset-0 z-[60] flex flex-col bg-background/96 backdrop-blur-xl md:hidden" role="dialog" aria-modal="true" aria-label="Menu">
-          <div className="flex h-[4.5rem] items-center justify-between px-6">
+        <div className="menu-panel fixed inset-0 z-[60] flex h-dvh flex-col overflow-y-auto bg-background md:hidden" role="dialog" aria-modal="true" aria-label="Menu">
+          <div className="flex h-[4.5rem] shrink-0 items-center justify-between px-5">
             <Monogram />
             <button
+              ref={closer}
               type="button"
               onClick={() => setMenuOpen(false)}
               aria-label="Close menu"
-              className="grid h-11 w-11 place-items-center rounded-full border border-foreground/30"
+              className="-mr-2 grid h-11 w-11 place-items-center rounded-full"
             >
-              <X className="h-4 w-4" strokeWidth={1.6} />
+              <X className="h-7 w-7" strokeWidth={1.3} />
             </button>
           </div>
-          <nav aria-label="Mobile" className="flex flex-1 flex-col justify-center px-6 pb-24">
-            <ul className="space-y-2">
-              {[...NAV, { href: "#frequencies", label: "Skills" }, { href: "#achievements", label: "Achievements" }].map((n) => (
-                <li key={n.href}>
-                  <a href={n.href} onClick={() => setMenuOpen(false)} className="font-display block py-1.5 text-[2.6rem] leading-tight tracking-tight">
+          <nav aria-label="Mobile" className="flex flex-1 flex-col justify-center px-6 pb-10 pt-2">
+            <ul>
+              {MENU.map((n, i) => (
+                <li key={n.href} className="menu-item border-b border-border/70 last:border-b-0" style={{ ["--i" as string]: i }}>
+                  <a href={n.href} onClick={() => setMenuOpen(false)} className="font-display flex items-baseline justify-between py-3 text-[2.1rem] leading-tight tracking-tight">
                     {n.label}
+                    <span aria-hidden className="text-[0.8rem] tabular-nums text-muted-foreground">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
                   </a>
                 </li>
               ))}
             </ul>
-            <div className="mt-10 flex items-center gap-4 text-[0.95rem] text-muted-foreground sm:hidden">
+            <div className="menu-item mt-8 flex items-center gap-4 text-[0.95rem] text-muted-foreground sm:hidden" style={{ ["--i" as string]: MENU.length }}>
               Theme
               <ThemeToggle />
             </div>
           </nav>
         </div>
       )}
-
     </>
   );
 }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CircleAlert, TrendingUp, Wrench, type LucideIcon } from "lucide-react";
+import { ChevronDown, CircleAlert, TrendingUp, Wrench, type LucideIcon } from "lucide-react";
 
 import { BUILD_LOG } from "@/components/portfolio/data";
 import { Section } from "./Section";
@@ -20,36 +20,36 @@ function Row({ icon: Icon, label, children, strong = false }: { icon: LucideIcon
 }
 
 export function BuildLog() {
-  const [active, setActive] = useState(BUILD_LOG[0].month);
-  const current = BUILD_LOG.find((m) => m.month === active) ?? BUILD_LOG[0];
+  // newest month first, and open on it
+  const months = [...BUILD_LOG].reverse();
+  const [active, setActive] = useState(months[0].month);
+  const current = months.find((m) => m.month === active) ?? months[0];
 
   return (
     <Section id="build-log" title="Build log" note="An engineering journal: the problem, what I changed, and what it did.">
-      <div role="tablist" aria-label="Month" className="flex flex-wrap gap-2">
-        {BUILD_LOG.map((m) => {
-          const selected = m.month === active;
-          return (
-            <button
-              key={m.month}
-              type="button"
-              role="tab"
-              id={`log-${m.month}`}
-              aria-selected={selected}
-              aria-controls="log-panel"
-              onClick={() => setActive(m.month)}
-              className={`h-10 rounded-full px-4 text-[0.9rem] transition-colors duration-500 ${
-                selected ? "bg-foreground text-background" : "border border-foreground/20 text-foreground/75 hover:border-foreground/50 hover:text-foreground"
-              }`}
-            >
+      {/* a native select: it opens the phone's own picker, and scales to any number of months */}
+      <div className="relative inline-block">
+        <label htmlFor="log-month" className="sr-only">
+          Month
+        </label>
+        <select
+          id="log-month"
+          value={active}
+          onChange={(e) => setActive(e.target.value)}
+          className="h-12 min-w-[13rem] cursor-pointer appearance-none rounded-full border border-foreground/25 bg-card pl-5 pr-12 text-[0.98rem] text-foreground transition-colors duration-300 hover:border-foreground/50"
+        >
+          {months.map((m) => (
+            <option key={m.month} value={m.month}>
               {m.month}
-            </button>
-          );
-        })}
+            </option>
+          ))}
+        </select>
+        <ChevronDown aria-hidden className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground/70" strokeWidth={1.8} />
       </div>
 
-      <ul id="log-panel" role="tabpanel" aria-labelledby={`log-${active}`} className="mt-7 grid gap-4 md:grid-cols-3">
+      <ul key={current.month} aria-live="polite" className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {current.entries.map((e, i) => (
-          <Card as="li" key={e.challenge} className="reveal space-y-5 p-6" style={{ ["--i" as string]: i }}>
+          <Card as="li" key={e.challenge} className="reveal space-y-5 p-6" style={{ ["--i" as string]: i % 3 }}>
             <Row icon={CircleAlert} label="Problem">
               {e.challenge}
             </Row>

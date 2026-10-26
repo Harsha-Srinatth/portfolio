@@ -13,8 +13,9 @@ import { BuildLog } from "@/components/home/BuildLog";
 import { Contact } from "@/components/home/Contact";
 import { Footer } from "@/components/home/Footer";
 import { Course } from "@/components/home/Section";
-import { Cursor } from "@/components/home/Cursor";
 import { useReveal } from "@/components/home/useReveal";
+import { LIKES_EVENT } from "@/components/home/likeStore";
+import { Toaster } from "@/components/home/Toast";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -39,6 +40,13 @@ function Index() {
   const [visitorCount, setVisitorCount] = useState<number | null>(null);
   const [hearts, setHearts] = useState<number | null>(null);
   useReveal();
+
+  // a like sent from the hero card updates the count shown in the footer
+  useEffect(() => {
+    const onLikes = (e: Event) => setHearts((e as CustomEvent<number>).detail);
+    window.addEventListener(LIKES_EVENT, onLikes);
+    return () => window.removeEventListener(LIKES_EVENT, onLikes);
+  }, []);
 
   // Every page open increments the global visitor count (no per-user tracking).
   // recordVisitOnce() guarantees one increment per page load, even under
@@ -80,7 +88,7 @@ function Index() {
         <Contact />
       </main>
       <Footer visitorCount={visitorCount} hearts={hearts} onHeartsChange={setHearts} />
-      <Cursor />
+      <Toaster />
     </>
   );
 }

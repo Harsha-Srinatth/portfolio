@@ -94,7 +94,7 @@ const fmt = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString("en
 export function Contributions() {
   const now = new Date().getFullYear();
   const years = Array.from({ length: now - FIRST_YEAR + 1 }, (_, i) => now - i);
-  const [year, setYear] = useState(Math.min(2025, now));
+  const [year, setYear] = useState(now); // opens on the latest year
   const [data, setData] = useState<GithubActivity | null>(null);
   const [failedYear, setFailedYear] = useState<number | null>(null);
   const failed = failedYear === year;

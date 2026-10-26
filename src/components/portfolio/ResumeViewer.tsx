@@ -8,13 +8,14 @@ type ResumeViewerProps = {
 };
 
 export function ResumeViewer({ open, onClose }: ResumeViewerProps) {
+  const fileName = PERSON.resumeUrl.split("/").pop() ?? "resume.pdf";
   return (
     <PdfViewer
       open={open}
       onClose={onClose}
       src={PERSON.resumeUrl}
-      title="harsha_res.pdf"
-      downloadName="harsha_res.pdf"
+      title={fileName}
+      downloadName={fileName}
     />
   );
 }

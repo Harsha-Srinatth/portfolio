@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowRight } from "lucide-react";
 
 import { PERSON } from "@/components/portfolio/data";
@@ -45,25 +45,35 @@ function useWide() {
 }
 
 /*
- * The scene is revealed once per page load: it is built under a copy of the
- * wall (the veil), given a few frames to be fully drawn, and then uncovered
- * by a warm glow spreading from the centre to every corner — so it never
- * appears piece by piece. Later mounts (a remount, a resize across the
- * breakpoint) show it straight away.
+ * The scene is revealed once per page load. It is mounted and drawn first, at
+ * a hair's breadth above fully transparent (browsers skip drawing what is
+ * fully hidden, which made the first reveal frame stall for a second), given
+ * a moment to settle, and then faded in while a warm glow blooms from the
+ * centre to every corner. Both moves are opacity and transform only, so they
+ * run on the compositor. Later mounts (a resize across the breakpoint) show
+ * the scene straight away.
  */
 let revealed = false;
 
-/** Wait until the browser has drawn the freshly mounted scene. */
+/** Wait until the browser has drawn the freshly mounted scene, then let it settle. */
 function afterPaint(cb: () => void) {
-  let id = requestAnimationFrame(() => {
-    id = requestAnimationFrame(() => {
-      if ("requestIdleCallback" in window) {
-        const idleId = window.requestIdleCallback(cb, { timeout: 400 });
-        id = -idleId;
-      } else cb();
+  let raf = 0;
+  let idleId = 0;
+  let timer = 0;
+  raf = requestAnimationFrame(() => {
+    raf = requestAnimationFrame(() => {
+      const settle = () => {
+        timer = window.setTimeout(cb, 450);
+      };
+      if ("requestIdleCallback" in window) idleId = window.requestIdleCallback(settle, { timeout: 600 });
+      else settle();
     });
   });
-  return () => (id < 0 ? window.cancelIdleCallback(-id) : cancelAnimationFrame(id));
+  return () => {
+    cancelAnimationFrame(raf);
+    if (idleId) window.cancelIdleCallback(idleId);
+    window.clearTimeout(timer);
+  };
 }
 
 /** The sunlit wall. The light comes from the upper right. */
@@ -83,7 +93,7 @@ function Backdrop() {
 /** A line of the name, sliding up from behind a mask (pure CSS: it runs from the first paint). */
 function Line({ children, delay }: { children: React.ReactNode; delay: number }) {
   return (
-    <span className="block overflow-hidden pb-[0.06em]">
+    <span className="block overflow-hidden pb-[0.14em] -mb-[0.08em]">
       <span className="hero-line block" style={{ animationDelay: `${delay}s` }}>
         {children}
       </span>
@@ -96,7 +106,7 @@ export function Hero() {
   const wide = useWide();
   const section = useRef<HTMLElement>(null);
   const [open, setOpen] = useState(revealed);
-  const [veiled, setVeiled] = useState(!revealed);
+  const [glow, setGlow] = useState(!revealed);
 
   // pause the breeze while the hero is out of view (see .hero-still)
   useEffect(() => {
@@ -117,10 +127,13 @@ export function Hero() {
     });
   }, [ready, open]);
 
+  // a stable element, so the memoised scene layers are not redone when only the reveal state changes
+  const cards = useMemo(() => (wide ? <SceneCards /> : <CompactCards />), [wide]);
+
   const scene = ready && (
-    <div className={`scene-frame absolute inset-0 ${wide ? "" : "scene-frame--stacked"}`}>
-      <BotanicalScene density={wide ? 1 : 0.8} snapshot={wide}>
-        {wide ? <SceneCards /> : <CompactCards />}
+    <div className={`scene-frame absolute inset-0 ${open ? "scene-in" : "scene-pre"} ${wide ? "" : "scene-frame--stacked"}`}>
+      <BotanicalScene density={wide ? 1 : 0.8} snapshot={wide} settled={open && !glow}>
+        {cards}
       </BotanicalScene>
     </div>
   );
@@ -133,7 +146,7 @@ export function Hero() {
 
       <div className="pointer-events-none relative z-10 mx-auto w-full max-w-[1920px] px-6 pt-[5.5rem] md:px-12 md:pt-[8rem] wide:px-[clamp(3rem,3.8vw,5.5rem)] wide:pt-[clamp(7rem,21vh,13rem)]">
         <div className="max-w-[44rem] wide:max-w-[min(46rem,41vw)]">
-          <h1 className="text-name text-[clamp(2.4rem,12.2vw,4.6rem)] md:text-[clamp(3.6rem,8.4vw,5.6rem)] wide:text-[clamp(3.2rem,5.85vw,7.6rem)]">
+          <h1 className="text-name text-[clamp(2.3rem,11.2vw,4.4rem)] md:text-[clamp(3.4rem,7.8vw,5.3rem)] wide:text-[clamp(3rem,5.4vw,7rem)]">
             <Line delay={0.15}>Harsha</Line>
             <Line delay={0.27}>Srinatth Ryali</Line>
           </h1>
@@ -180,15 +193,8 @@ export function Hero() {
           section never peeks in half-cut at the bottom */}
       <div className="scene-stack relative z-0 -mt-[2vw] w-full wide:hidden">{!wide && scene}</div>
 
-      {/* the reveal: a copy of the wall over the scene, opened from the centre */}
-      {veiled && (
-        <>
-          <div aria-hidden className={`scene-veil pointer-events-none absolute inset-0 z-[5] ${open ? "is-open" : ""}`} onAnimationEnd={() => setVeiled(false)}>
-            <Backdrop />
-          </div>
-          <div aria-hidden className={`scene-glow pointer-events-none absolute inset-0 z-[5] ${open ? "is-open" : ""}`} />
-        </>
-      )}
+      {/* the reveal's glow, blooming from the centre to every corner */}
+      {glow && open && <div aria-hidden className="scene-glow pointer-events-none absolute inset-0 z-[5]" onAnimationEnd={() => setGlow(false)} />}
     </section>
   );
 }

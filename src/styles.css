@@ -2,6 +2,7 @@
 @source "../src";
 @import "tw-animate-css";
 @import "@fontsource-variable/fraunces/full.css";
+@import "@fontsource-variable/playfair-display/index.css";
 @import "@fontsource-variable/inter/opsz.css";
 
 @custom-variant dark (&:is(.dark *));
@@ -274,12 +275,13 @@
     font-variation-settings: "SOFT" 0, "WONK" 0;
   }
 
+  /* The name: Playfair Display, a sturdy high-contrast serif whose letters
+     stay distinct (Fraunces fused the "tt" in Srinatth at this tightness). */
   .text-name {
-    font-family: var(--font-display);
-    font-variation-settings: "opsz" 144, "SOFT" 0, "WONK" 0;
-    font-weight: 420;
-    letter-spacing: -0.03em;
-    line-height: 0.93;
+    font-family: "Playfair Display Variable", "Playfair Display", var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    line-height: 0.98;
   }
 
   /* Small tracked label, used sparingly */
@@ -998,162 +1000,100 @@
   from { opacity: 0; transform: translateY(12px); }
 }
 
-@property --reveal {
-  syntax: "<percentage>";
-  inherits: false;
-  initial-value: 0%;
+/* drawn at 1% so the browser rasterises it while it waits; revealed by a fade */
+.scene-pre {
+  opacity: 0.01;
 }
-.scene-veil {
-  mask-image: radial-gradient(circle at 50% 50%, transparent var(--reveal), #000 calc(var(--reveal) + 16%));
+.scene-in {
+  opacity: 1;
+  transition: opacity 1.5s cubic-bezier(0.3, 0.1, 0.25, 1);
 }
 .scene-glow {
-  background: radial-gradient(
-    circle at 50% 50%,
-    transparent calc(var(--reveal) - 12%),
-    var(--reveal-glow) var(--reveal),
-    transparent calc(var(--reveal) + 14%)
-  );
+  background: radial-gradient(circle at 50% 50%, var(--reveal-glow) 0%, color-mix(in oklab, var(--reveal-glow) 35%, transparent) 30%, transparent 62%);
   opacity: 0;
+  transform: scale(0.15);
+  will-change: transform, opacity;
+  animation: bloom 2s cubic-bezier(0.3, 0.1, 0.25, 1) forwards;
 }
-.scene-veil.is-open {
-  animation: reveal 1.9s cubic-bezier(0.55, 0.05, 0.25, 1) forwards;
-}
-.scene-glow.is-open {
-  animation:
-    reveal 1.9s cubic-bezier(0.55, 0.05, 0.25, 1) forwards,
-    reveal-glow 1.9s ease-out forwards;
-}
-@keyframes reveal {
-  to { --reveal: 125%; }
-}
-@keyframes reveal-glow {
-  0% { opacity: 0; }
-  15% { opacity: 1; }
-  75% { opacity: 0.8; }
-  100% { opacity: 0; }
+@keyframes bloom {
+  0% { opacity: 0; transform: scale(0.15); }
+  22% { opacity: 1; }
+  100% { opacity: 0; transform: scale(2); }
 }
 
-/* The trailing cursor ring (Cursor.tsx): a thin ink circle that fills with
-   a little jade over anything clickable. */
-.cursor-ring {
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 100;
-  width: 2.1rem;
-  height: 2.1rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in oklab, var(--foreground) 45%, transparent);
-  background: transparent;
-  pointer-events: none;
-  opacity: 0;
-  will-change: transform;
-  transition:
-    background-color 0.3s ease,
-    border-color 0.3s ease;
+/* the heart pops when it turns red */
+.like-pop {
+  animation: like-pop 0.45s cubic-bezier(0.34, 1.6, 0.64, 1);
 }
-.cursor-ring[data-hot="1"] {
-  border-color: color-mix(in oklab, var(--accent) 70%, transparent);
-  background: color-mix(in oklab, var(--accent) 12%, transparent);
+@keyframes like-pop {
+  0% { transform: scale(0.6); }
+  60% { transform: scale(1.25); }
+  100% { transform: scale(1); }
 }
 
-/* ---------------------------------------------------------------- */
-/* Below the hero: quiet motion (Ambient.tsx)                       */
-/* ---------------------------------------------------------------- */
-
-/* Ambient loops run only while their section is on screen (data-live is
-   set by the section as it enters and leaves the viewport). */
-.ambient {
-  animation-play-state: paused !important;
-}
-[data-live="true"] .ambient {
-  animation-play-state: running !important;
+/* phones and tablets leave out the least important lines of each card */
+.card-compact .card-extra {
+  display: none;
 }
 
-/* sunlight through leaves, drifting over the wall */
-.leaf-light {
-  animation: leaf-drift 30s ease-in-out infinite alternate;
+/* the phone menu: the panel fades in, then the links rise one by one */
+.menu-panel {
+  animation: menu-in 0.28s ease-out both;
 }
-@keyframes leaf-drift {
-  from { transform: translate(-3%, 2%) rotate(-2deg) scale(1.02); }
-  to { transform: translate(3%, -2%) rotate(2deg) scale(1.06); }
+.menu-item {
+  animation: menu-item-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(80ms + var(--i, 0) * 45ms);
 }
-
-/* grass at the foot of the page leans from its roots */
-.grass-a,
-.grass-b {
-  transform-origin: 50% 100%;
-  will-change: transform;
-  animation: grass-lean 5.6s ease-in-out infinite alternate;
+@keyframes menu-in {
+  from { opacity: 0; }
 }
-.grass-b {
-  animation-duration: 7.3s;
-  animation-delay: -2.4s;
+@keyframes menu-item-in {
+  from { opacity: 0; transform: translateY(14px); }
 }
-@keyframes grass-lean {
-  from { transform: skewX(-4deg); }
-  to { transform: skewX(3deg); }
-}
-
-/* the record in the Music picture turns while it is on screen */
-.spin-record {
-  will-change: transform;
-  animation: spin 10s linear infinite;
-}
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* the contribution graph fills in, week by week, the first time it is seen */
-.contrib-grow .contrib-col {
-  animation: contrib-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--c) * 12ms);
-}
-@keyframes contrib-in {
-  from { opacity: 0; transform: translateY(4px); }
-}
-
-/* One-time entrances (useReveal.ts): cards settle into place, and the
-   Path's vine grows across the stages, the first time each is seen. */
-.reveal-ready .reveal:not(.is-in) {
-  opacity: 0;
-  transform: translateY(18px);
-}
-.reveal-ready .reveal {
-  transition:
-    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-  transition-delay: calc(var(--i, 0) * 80ms);
-}
-.reveal-ready .vine:not(.is-in) .vine-stem {
-  stroke-dashoffset: 1;
-}
-.vine-stem {
-  stroke-dasharray: 1;
-  transition: stroke-dashoffset 1.8s cubic-bezier(0.45, 0, 0.25, 1);
-}
-.reveal-ready .vine:not(.is-in) .vine-leaf-g {
-  transform: scale(0) rotate(-30deg);
-  opacity: 0;
-}
-.vine-leaf-g {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  transition:
-    transform 0.6s cubic-bezier(0.34, 1.4, 0.64, 1),
-    opacity 0.4s ease;
-  transition-delay: calc(0.35s + var(--i) * 0.55s);
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .ambient,
-  .contrib-grow .contrib-col {
-    animation: none !important;
+  .menu-panel,
+  .menu-item {
+    animation: none;
   }
-  /* no reveal either: the scene is simply there */
-  .scene-veil,
-  .scene-glow {
-    display: none;
+}
+
+/* the toast rises in, then fades out */
+.toast {
+  animation: toast-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.96); }
+}
+
+/* The Music card's waves (HangingCards.tsx): three sine curves sliding at
+   different speeds while "playing"; flat and hidden when paused. */
+.wave-field {
+  transition: opacity 0.5s ease;
+}
+.wave-field .wave {
+  animation: wave-slide var(--wd, 3.2s) linear infinite;
+  will-change: transform;
+}
+.wave-field .wave-swell {
+  transform-origin: 50% 50%;
+  animation: wave-swell 1.9s ease-in-out infinite alternate;
+}
+@keyframes wave-slide {
+  to { transform: translateX(-50%); }
+}
+@keyframes wave-swell {
+  from { transform: scaleY(0.45); }
+  to { transform: scaleY(1); }
+}
+.hero-still .wave-field .wave,
+.hero-still .wave-field .wave-swell {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .wave-field .wave,
+  .wave-field .wave-swell,
+  .toast {
+    animation: none !important;
   }
 }
 

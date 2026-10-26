@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, type CSSProperties } from "react";
+import { memo, useEffect, useMemo, useRef, type CSSProperties } from "react";
 
 import { useTheme } from "@/lib/theme";
 import { freezeScene } from "./freeze";
@@ -143,45 +143,14 @@ function SprayStill({ s }: { s: Spray }) {
   );
 }
 
-/** How long after mounting to snapshot the art: once the reveal has finished. */
-const FREEZE_AFTER = 2400;
+/** How long after the scene has settled (the reveal is over) to snapshot the art. */
+const FREEZE_AFTER = 900;
 
 /**
- * `snapshot`: keep the drawn art as bitmaps once shown (see freeze.ts). Worth
- * it for the large desktop scene; on phones the smaller scene redraws about
- * as fast as the bitmaps come back, and taking them costs a slow phone
- * seconds of work, so it is left off there.
+ * Every layer of the scene. Memoised: the scene's parent re-renders when the
+ * reveal moves on, and redoing ~200 leaf layers for that cost a visible hitch.
  */
-export function BotanicalScene({ density = 1, snapshot = false, children }: { density?: number; snapshot?: boolean; children?: React.ReactNode }) {
-  const art = useMemo(() => cachedArt(density), [density]);
-  const root = useRef<HTMLDivElement>(null);
-  const theme = useTheme();
-
-  // Keep the drawn scene as bitmaps (see freeze.ts). A theme change or a
-  // resize puts the live vector art back at once and snapshots it again
-  // when things settle.
-  useEffect(() => {
-    const el = root.current;
-    if (!el || !snapshot) return;
-    let thaw: (() => void) | null = null;
-    let timer = window.setTimeout(() => (thaw = freezeScene(el)), FREEZE_AFTER);
-    let size = `${el.clientWidth}x${el.clientHeight}`;
-    const ro = new ResizeObserver(() => {
-      const next = `${el.clientWidth}x${el.clientHeight}`;
-      if (next === size) return;
-      size = next;
-      thaw?.();
-      thaw = null;
-      clearTimeout(timer);
-      timer = window.setTimeout(() => (thaw = freezeScene(el)), 600);
-    });
-    ro.observe(el);
-    return () => {
-      ro.disconnect();
-      clearTimeout(timer);
-      thaw?.();
-    };
-  }, [theme, density, snapshot]);
+const Layers = memo(function Layers({ art, children }: { art: ReturnType<typeof buildTreeArt>; children?: React.ReactNode }) {
   const back = art.sprays.filter((s) => s.group === "back");
   const crown = art.sprays.filter((s) => s.group === "crown");
   const front = art.sprays.filter((s) => s.group === "front" || s.group === "fringe");
@@ -189,7 +158,7 @@ export function BotanicalScene({ density = 1, snapshot = false, children }: { de
   const box = `0 0 ${VIEW.w} ${VIEW.h}`;
 
   return (
-    <div ref={root} className="botanical-scene pointer-events-none absolute inset-0 overflow-hidden">
+    <>
       {/* light: the crown's shade on the wall and a warm glow behind it */}
       <svg aria-hidden className="absolute" style={full} viewBox={box} overflow="visible" data-freeze="300 40 20 40">
         <defs>
@@ -331,6 +300,50 @@ export function BotanicalScene({ density = 1, snapshot = false, children }: { de
       ))}
 
       {children}
+    </>
+  );
+});
+
+/**
+ * `snapshot`: keep the drawn art as bitmaps once shown (see freeze.ts). Worth
+ * it for the large desktop scene; on phones the smaller scene redraws about
+ * as fast as the bitmaps come back, and taking them costs a slow phone
+ * seconds of work, so it is left off there.
+ */
+export function BotanicalScene({ density = 1, snapshot = false, settled = true, children }: { density?: number; snapshot?: boolean; settled?: boolean; children?: React.ReactNode }) {
+  const art = useMemo(() => cachedArt(density), [density]);
+  const root = useRef<HTMLDivElement>(null);
+  const theme = useTheme();
+
+  // Keep the drawn scene as bitmaps (see freeze.ts). A theme change or a
+  // resize puts the live vector art back at once and snapshots it again
+  // when things settle.
+  useEffect(() => {
+    const el = root.current;
+    // never while the reveal is still playing: saving the art is heavy work
+    if (!el || !snapshot || !settled) return;
+    let thaw: (() => void) | null = null;
+    let timer = window.setTimeout(() => (thaw = freezeScene(el)), FREEZE_AFTER);
+    let size = `${el.clientWidth}x${el.clientHeight}`;
+    const ro = new ResizeObserver(() => {
+      const next = `${el.clientWidth}x${el.clientHeight}`;
+      if (next === size) return;
+      size = next;
+      thaw?.();
+      thaw = null;
+      clearTimeout(timer);
+      timer = window.setTimeout(() => (thaw = freezeScene(el)), 600);
+    });
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      clearTimeout(timer);
+      thaw?.();
+    };
+  }, [theme, density, snapshot, settled]);
+  return (
+    <div ref={root} className="botanical-scene pointer-events-none absolute inset-0 overflow-hidden">
+      <Layers art={art}>{children}</Layers>
     </div>
   );
 }

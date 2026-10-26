@@ -1,8 +1,8 @@
 import { useState, useSyncExternalStore } from "react";
 import { Heart } from "lucide-react";
 
-import { incrementLike } from "@/lib/api/stats.functions";
 import { Ground } from "./Ambient";
+import { readLiked, sendLike, subscribeLiked } from "./likeStore";
 import { useInView } from "./useInView";
 
 function ordinal(n: number) {
@@ -10,8 +10,6 @@ function ordinal(n: number) {
   const v = n % 100;
   return n.toLocaleString("en-IN") + (s[(v - 20) % 10] ?? s[v] ?? s[0]);
 }
-
-const LIKED_KEY = "rhs.liked";
 
 type FooterProps = {
   visitorCount: number | null;
@@ -24,18 +22,9 @@ type FooterProps = {
  * store (Upstash Redis in production) — nothing here is initialised locally.
  * One applause per browser, as before.
  */
-function readLiked() {
-  try {
-    return localStorage.getItem(LIKED_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-const noSubscribe = () => () => {};
-
 export function Footer({ visitorCount, hearts, onHeartsChange }: FooterProps) {
   // Previously applauded in this browser (read after hydration, never on the server).
-  const likedBefore = useSyncExternalStore(noSubscribe, readLiked, () => false);
+  const likedBefore = useSyncExternalStore(subscribeLiked, readLiked, () => false);
   const [likedNow, setLiked] = useState(false);
   const liked = likedBefore || likedNow;
   const [pending, setPending] = useState(false);
@@ -47,14 +36,8 @@ export function Footer({ visitorCount, hearts, onHeartsChange }: FooterProps) {
     setPending(true);
     setFailed(false);
     try {
-      const updated = await incrementLike();
-      onHeartsChange(updated.likes);
+      onHeartsChange(await sendLike());
       setLiked(true);
-      try {
-        localStorage.setItem(LIKED_KEY, "1");
-      } catch {
-        /* storage unavailable */
-      }
     } catch (error) {
       console.error("[stats] Failed to record like", error);
       setFailed(true);
@@ -71,7 +54,7 @@ export function Footer({ visitorCount, hearts, onHeartsChange }: FooterProps) {
             Enjoyed the visit?
           </p>
           <p className="mt-3 max-w-[22rem] text-[0.98rem] leading-relaxed text-muted-foreground">
-            Leave a quiet round of applause. One tap is enough.
+            Tap the heart if you liked it. One tap is enough.
           </p>
         </div>
 
@@ -82,25 +65,25 @@ export function Footer({ visitorCount, hearts, onHeartsChange }: FooterProps) {
               onClick={() => void applaud()}
               disabled={liked || pending}
               aria-pressed={liked}
-              className={`btn ${liked ? "btn-solid" : "btn-line"} disabled:cursor-default`}
+              className="btn btn-line disabled:cursor-default"
             >
-              <Heart className={`h-4 w-4 transition-transform duration-500 ${liked ? "scale-110 fill-current" : ""}`} strokeWidth={1.6} />
-              {liked ? "Thank you" : pending ? "Sending…" : "Applaud"}
+              <Heart className={`h-4 w-4 transition-[transform,color,fill] duration-500 ${liked ? "scale-110 fill-[#e5384f] text-[#e5384f]" : ""}`} strokeWidth={1.6} />
+              {liked ? "Thank you" : pending ? "Sending…" : "Like"}
             </button>
             <p className="text-[0.98rem]" aria-live="polite">
               {hearts === null ? (
-                <span className="text-muted-foreground">Loading applause…</span>
+                <span className="text-muted-foreground">Loading likes…</span>
               ) : (
                 <>
                   <span className="font-display text-[1.6rem] tabular-nums">{hearts.toLocaleString("en-IN")}</span>{" "}
-                  <span className="text-muted-foreground">{hearts === 1 ? "person has" : "people have"} applauded</span>
+                  <span className="text-muted-foreground">{hearts === 1 ? "person" : "people"} liked this</span>
                 </>
               )}
             </p>
           </div>
           {failed && (
             <p className="mt-3 text-[0.9rem] text-destructive" role="alert">
-              Your applause didn’t reach the server. Check your connection and tap again.
+              Your like didn’t reach the server. Check your connection and tap again.
             </p>
           )}
 

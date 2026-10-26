@@ -20,10 +20,15 @@ export const PERSON = {
   location: "Bhimavaram, Andhra Pradesh",
   education: "B.Tech CSBS (Computer Science & Business Systems) — 8.75 / 10 CGPA",
   also: "Music · Lo-fi · Ambient · Instrumental",
-  resumeUrl: "/harsha_res.pdf",
-  // Profile photo for the hero card, e.g. "/profile.jpg" in /public.
-  // Until one is added, the card shows the HS monogram instead.
-  photo: undefined as string | undefined,
+  resumeUrl: "/Harsha_Res-Aug26.pdf",
+  // Hero profile photo: a 560 px face crop of IMG_20261025_112346.jpg
+  // (the original is ~700 KB and is not shipped with the site).
+  photo: "/profile.jpg",
+  /** Optional crop for a different photo: object-position, and a zoom. */
+  photoPosition: "center 45%" as string | undefined,
+  photoScale: 1 as number | undefined,
+  // The hero's Music card. Add a real track here when there is one.
+  song: { title: "Lo-fi & ambient", note: "What I code to" },
   likes: ["Listening to music", "Exploring tech", "Good food", "Travel & capturing moments"],
   socials: [
     { label: "GitHub", handle: "@Harsha-Srinatth", url: "https://github.com/Harsha-Srinatth" },
@@ -75,19 +80,6 @@ export const ACHIEVEMENTS: Achievement[] = [
   },
 ];
 
-export const LEARNING_PATH = [
-  "Code",
-  "Algorithms",
-  "Systems",
-  "Scale",
-  "Data",
-  "Intelligence",
-  "Learning",
-  "Reasoning",
-  "Autonomy",
-  "Emergence",
-];
-
 export const BUILD_LOG = [
   {
     month: "March 2026",
@@ -131,6 +123,66 @@ export const BUILD_LOG = [
         challenge: "Costly LLM calls on every keystroke",
         solution: "Debounce + semantic cache in Redis",
         outcome: "LLM spend −62% with no UX loss",
+      },
+    ],
+  },
+  {
+    month: "June 2026",
+    entries: [
+      {
+        challenge: "Visitor and like counts had nowhere durable to live on a serverless host",
+        solution: "Stored them in Upstash Redis behind a small /api/stats endpoint",
+        outcome: "Counts persist between visits and deploys",
+      },
+      {
+        challenge: "New font styles did not show up on the live site",
+        solution: "Found generated build files committed to the repo and stopped tracking them",
+        outcome: "Style changes now reach the live site after each push",
+      },
+      {
+        challenge: "Projects had no way to reach their running apps",
+        solution: "Added a live URL to each project",
+        outcome: "Every project opens its deployed app",
+      },
+    ],
+  },
+  {
+    month: "July 2026",
+    entries: [
+      {
+        challenge: "The live site kept serving an old build after pushes",
+        solution: "Removed the committed build output so Vercel builds from source",
+        outcome: "Each push deploys the current code",
+      },
+    ],
+  },
+  {
+    month: "August 2026",
+    entries: [
+      {
+        challenge: "My résumé showed only one project",
+        solution: "Added SalonFlow, a real-time salon queue and booking SaaS, plus my CGPA and GPA",
+        outcome: "The résumé now shows two full-stack projects",
+      },
+    ],
+  },
+  {
+    month: "October 2026",
+    entries: [
+      {
+        challenge: "Scrolling back to the top froze the page for about half a second",
+        solution: "Saved the drawn tree as images once it has appeared",
+        outcome: "Worst frame on return fell from about 550 ms to about 100 ms",
+      },
+      {
+        challenge: "The GitHub graph was a generated pattern, not my real activity",
+        solution: "Read GitHub's public contribution calendar on the server and cached it for six hours",
+        outcome: "The graph shows real days, including my 2025 total",
+      },
+      {
+        challenge: "Hundreds of swaying leaf layers kept the page busy even when idle",
+        solution: "Switched to fixed-step animations and paused them while off screen",
+        outcome: "Idle style work on desktop fell from about 500 ms to 290 ms per two seconds",
       },
     ],
   },

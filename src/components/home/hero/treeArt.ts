@@ -1130,7 +1130,7 @@ export type Hanger = ReturnType<typeof hanger>;
 export const HANGERS = {
   music: hanger("left", 826, 216, 240, 286, 0.8),
   profile: hanger("lowLeft", 1140, 398, 228, 362, 0),
-  about: hanger("right", 1534, 340, 248, 272, -2.6),
+  like: hanger("right", 1534, 340, 248, 272, -2.6),
 };
 
 /**
