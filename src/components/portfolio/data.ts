@@ -21,12 +21,13 @@ export const PERSON = {
   education: "B.Tech CSBS (Computer Science & Business Systems) — 8.75 / 10 CGPA",
   also: "Music · Lo-fi · Ambient · Instrumental",
   resumeUrl: "/Harsha_Res-Aug26.pdf",
-  // Hero profile photo: a 560 px face crop of IMG_20261025_112346.jpg
-  // (the original is ~700 KB and is not shipped with the site).
+  // Hero profile photo: IMG_20261025_112346.jpg, pre-cropped to the framing
+  // that was set for it (object-position center 42%, zoom 1.38) and shrunk to
+  // 560 px, so the page does not ship the ~700 KB original.
   photo: "/profile.jpg",
   /** Optional crop for a different photo: object-position, and a zoom. */
-  photoPosition: "center 45%" as string | undefined,
-  photoScale: 1 as number | undefined,
+  photoPosition: undefined as string | undefined,
+  photoScale: undefined as number | undefined,
   // The hero's Music card. Add a real track here when there is one.
   song: { title: "Lo-fi & ambient", note: "What I code to" },
   likes: ["Listening to music", "Exploring tech", "Good food", "Travel & capturing moments"],

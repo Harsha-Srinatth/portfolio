@@ -48,10 +48,10 @@ function useWide() {
  * The scene is revealed once per page load. It is mounted and drawn first, at
  * a hair's breadth above fully transparent (browsers skip drawing what is
  * fully hidden, which made the first reveal frame stall for a second), given
- * a moment to settle, and then faded in while a warm glow blooms from the
- * centre to every corner. Both moves are opacity and transform only, so they
- * run on the compositor. Later mounts (a resize across the breakpoint) show
- * the scene straight away.
+ * a moment to settle, and then opened up by a circle growing from the centre
+ * to every corner, with a ring of warm light along its edge. The circle is a
+ * clip-path and the ring a transform, so neither repaints the scene. Later
+ * mounts (a resize across the breakpoint) show the scene straight away.
  */
 let revealed = false;
 
@@ -131,11 +131,19 @@ export function Hero() {
   const cards = useMemo(() => (wide ? <SceneCards /> : <CompactCards />), [wide]);
 
   const scene = ready && (
-    <div className={`scene-frame absolute inset-0 ${open ? "scene-in" : "scene-pre"} ${wide ? "" : "scene-frame--stacked"}`}>
-      <BotanicalScene density={wide ? 1 : 0.8} snapshot={wide} settled={open && !glow}>
-        {cards}
-      </BotanicalScene>
-    </div>
+    <>
+      <div className={`scene-frame absolute inset-0 ${open ? "scene-in" : "scene-pre"} ${wide ? "" : "scene-frame--stacked"}`}>
+        <BotanicalScene density={wide ? 1 : 0.8} snapshot={wide} settled={open && !glow}>
+          {cards}
+        </BotanicalScene>
+      </div>
+      {/* the ring of light along the growing circle's edge */}
+      {glow && open && (
+        <div aria-hidden className="pointer-events-none absolute inset-0 z-[5] overflow-hidden">
+          <div className="scene-ring" onAnimationEnd={() => setGlow(false)} />
+        </div>
+      )}
+    </>
   );
 
   return (
@@ -193,8 +201,6 @@ export function Hero() {
           section never peeks in half-cut at the bottom */}
       <div className="scene-stack relative z-0 -mt-[2vw] w-full wide:hidden">{!wide && scene}</div>
 
-      {/* the reveal's glow, blooming from the centre to every corner */}
-      {glow && open && <div aria-hidden className="scene-glow pointer-events-none absolute inset-0 z-[5]" onAnimationEnd={() => setGlow(false)} />}
     </section>
   );
 }
