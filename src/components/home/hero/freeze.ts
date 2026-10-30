@@ -17,14 +17,23 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 const PAINT = ["fill", "stroke"] as const;
 const MAX_DPR = 2;
 
+/** Resolved `var(...)` paints: the scene uses few colours, on thousands of nodes. */
+const resolved = new Map<string, string>();
+
 /** Copy the computed colours of `from` onto `to`, so the snapshot needs no CSS variables. */
 function bakeColours(from: Element, to: Element) {
-  const cs = getComputedStyle(from);
   for (const p of PAINT) {
     const v = to.getAttribute(p);
-    if (v?.includes("var(")) to.setAttribute(p, cs.getPropertyValue(p));
+    if (!v?.includes("var(")) continue;
+    let colour = resolved.get(v);
+    if (colour === undefined) {
+      colour = getComputedStyle(from).getPropertyValue(p);
+      resolved.set(v, colour);
+    }
+    to.setAttribute(p, colour);
   }
   if (from.tagName === "stop") {
+    const cs = getComputedStyle(from);
     const style = (to as SVGElement).style;
     style.stopColor = cs.stopColor;
     style.stopOpacity = cs.stopOpacity;
@@ -128,6 +137,7 @@ export function freezeScene(root: HTMLElement) {
   let cancelled = false;
   const done: Frozen[] = [];
   const dpr = Math.min(MAX_DPR, window.devicePixelRatio || 1);
+  resolved.clear(); // the theme may have changed since the last snapshot
 
   (async () => {
     const svgs = [...root.querySelectorAll<SVGSVGElement>("svg[data-freeze]")];

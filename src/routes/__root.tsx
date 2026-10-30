@@ -1,8 +1,7 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
-  createRootRouteWithContext,
+  createRootRoute,
   useRouter,
   HeadContent,
   Scripts,
@@ -72,7 +71,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -108,11 +107,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 // Keep the key in sync with THEME_KEY in src/lib/theme.ts.
 const THEME_BOOT = `(function(){try{if(localStorage.getItem("rhs.theme")==="dark"){var r=document.documentElement;r.classList.add("dark");r.style.colorScheme="dark";}}catch(e){}})();`;
 
+// The wall colour (--background in styles.css), from the very first frame.
+const FIRST_FRAME = `html{background:#efe8dd}html.dark{background:#15120e}`;
+
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
+        <style dangerouslySetInnerHTML={{ __html: FIRST_FRAME }} />
         <HeadContent />
       </head>
       <body>
@@ -124,12 +127,6 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-    </QueryClientProvider>
-  );
+  // Required: nested routes render here. Removing <Outlet /> breaks all child routes.
+  return <Outlet />;
 }

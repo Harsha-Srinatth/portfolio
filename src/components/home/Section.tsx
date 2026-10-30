@@ -25,7 +25,7 @@ export function Section({
   // ambient motion inside runs only while the section is on screen
   const [ref, live] = useInView<HTMLElement>();
   return (
-    <section ref={ref} id={id} data-live={live} aria-labelledby={`${id}-title`} className={`relative isolate scroll-mt-6 ${backdrop ? "overflow-hidden" : ""} ${className}`}>
+    <section ref={ref} id={id} data-live={live} aria-labelledby={`${id}-title`} className={`section-lazy relative isolate scroll-mt-6 ${backdrop ? "overflow-hidden" : ""} ${className}`}>
       {backdrop}
       <div className="relative mx-auto max-w-[1920px] px-6 py-20 md:px-12 md:py-28 wide:px-[clamp(3rem,3.8vw,5.5rem)]">
         <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between md:gap-12">

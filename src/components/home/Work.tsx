@@ -1,11 +1,13 @@
 import { useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, LazyMotion, m, useReducedMotion } from "motion/react";
 import { ArrowRight, ArrowUpRight, CircleCheck, Layers, LayoutDashboard, Sparkles } from "lucide-react";
 
 import { PROJECTS, type Project } from "@/components/portfolio/data";
 import { ProjectArt } from "./ProjectArt";
 import { Section } from "./Section";
 import { Card, Chip, GithubMark, IconChip, NamedIcon } from "./ui";
+
+const motionFeatures = () => import("./motionFeatures").then((mod) => mod.default);
 
 const firstSentence = (s: string) => {
   const i = s.indexOf(". ");
@@ -120,18 +122,20 @@ export function Work() {
     <Section id="constellation" title="Work" note="Selected projects. Pick one to see how it was built.">
       <div ref={view} className="scroll-mt-6">
         <Card className="p-6 sm:p-8 lg:p-10">
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={current.id}
-              initial={reduce ? false : { opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={reduce ? undefined : { opacity: 0, y: -6 }}
-              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-              aria-live="polite"
-            >
-              <Featured p={current} />
-            </motion.div>
-          </AnimatePresence>
+          <LazyMotion features={motionFeatures}>
+            <AnimatePresence mode="wait" initial={false}>
+              <m.div
+                key={current.id}
+                initial={reduce ? false : { opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduce ? undefined : { opacity: 0, y: -6 }}
+                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+                aria-live="polite"
+              >
+                <Featured p={current} />
+              </m.div>
+            </AnimatePresence>
+          </LazyMotion>
         </Card>
       </div>
 

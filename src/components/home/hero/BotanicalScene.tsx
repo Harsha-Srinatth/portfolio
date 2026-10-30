@@ -1,9 +1,9 @@
-import { memo, useEffect, useMemo, useRef, type CSSProperties } from "react";
+import { memo, useEffect, useRef, type CSSProperties } from "react";
 
 import { useTheme } from "@/lib/theme";
 import { freezeScene } from "./freeze";
 
-import { SHADE_TRANSFORM, VIEW, buildTreeArt, sceneUnit as u, type Shade, type Spray, type Tuft } from "./treeArt";
+import { SHADE_TRANSFORM, VIEW, sceneUnit as u, type Shade, type Spray, type TreeArt, type Tuft } from "./treeArt";
 
 /**
  * The 2D botanical scene. Layout is pure CSS: the scene is a container whose
@@ -16,17 +16,6 @@ import { SHADE_TRANSFORM, VIEW, buildTreeArt, sceneUnit as u, type Shade, type S
  * and tuft of ground cover is its own small element animated with CSS
  * keyframes (transform only), so the breeze runs on the compositor.
  */
-
-// the art is deterministic, so build each density once per page
-const artCache = new Map<number, ReturnType<typeof buildTreeArt>>();
-function cachedArt(density: number) {
-  let art = artCache.get(density);
-  if (!art) {
-    art = buildTreeArt(density);
-    artCache.set(density, art);
-  }
-  return art;
-}
 
 function place(x: number, y: number, w: number, h: number): CSSProperties {
   return {
@@ -150,7 +139,7 @@ const FREEZE_AFTER = 900;
  * Every layer of the scene. Memoised: the scene's parent re-renders when the
  * reveal moves on, and redoing ~200 leaf layers for that cost a visible hitch.
  */
-const Layers = memo(function Layers({ art, children }: { art: ReturnType<typeof buildTreeArt>; children?: React.ReactNode }) {
+const Layers = memo(function Layers({ art, children }: { art: TreeArt; children?: React.ReactNode }) {
   const back = art.sprays.filter((s) => s.group === "back");
   const crown = art.sprays.filter((s) => s.group === "crown");
   const front = art.sprays.filter((s) => s.group === "front" || s.group === "fringe");
@@ -310,8 +299,7 @@ const Layers = memo(function Layers({ art, children }: { art: ReturnType<typeof 
  * as fast as the bitmaps come back, and taking them costs a slow phone
  * seconds of work, so it is left off there.
  */
-export function BotanicalScene({ density = 1, snapshot = false, settled = true, children }: { density?: number; snapshot?: boolean; settled?: boolean; children?: React.ReactNode }) {
-  const art = useMemo(() => cachedArt(density), [density]);
+export function BotanicalScene({ art, snapshot = false, settled = true, children }: { art: TreeArt; snapshot?: boolean; settled?: boolean; children?: React.ReactNode }) {
   const root = useRef<HTMLDivElement>(null);
   const theme = useTheme();
 
@@ -340,7 +328,7 @@ export function BotanicalScene({ density = 1, snapshot = false, settled = true, 
       clearTimeout(timer);
       thaw?.();
     };
-  }, [theme, density, snapshot, settled]);
+  }, [theme, art, snapshot, settled]);
   return (
     <div ref={root} className="botanical-scene pointer-events-none absolute inset-0 overflow-hidden">
       <Layers art={art}>{children}</Layers>

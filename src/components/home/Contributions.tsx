@@ -99,7 +99,11 @@ export function Contributions() {
   const [failedYear, setFailedYear] = useState<number | null>(null);
   const failed = failedYear === year;
 
+  // asks GitHub only as the card comes near, so it never competes with the first load
+  const [nearRef, near] = useInView<HTMLDivElement>({ once: true, margin: "800px 0px" });
+
   useEffect(() => {
+    if (!near) return;
     let live = true;
     load(year)
       .then((d) => live && setData(d))
@@ -107,7 +111,7 @@ export function Contributions() {
     return () => {
       live = false;
     };
-  }, [year]);
+  }, [year, near]);
 
   const shown = data?.year === year ? data : null;
   // fills in week by week the first time it is seen (with data)
@@ -117,6 +121,7 @@ export function Contributions() {
   const profile = `https://github.com/${GITHUB.username}`;
 
   return (
+    <div ref={nearRef}>
     <Card className="p-5 sm:p-7 md:p-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -188,5 +193,6 @@ export function Contributions() {
         </span>
       </div>
     </Card>
+    </div>
   );
 }
