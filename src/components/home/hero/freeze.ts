@@ -148,8 +148,11 @@ async function whenQuiet() {
   }
 }
 
-/** Snapshot every `svg[data-freeze]` under `root`, a few at a time in idle moments. Returns a thaw function. */
-export function freezeScene(root: HTMLElement) {
+/**
+ * Snapshot every `svg[data-freeze]` under `root`, one at a time in idle
+ * moments. `onDone` runs once all of them are saved. Returns a thaw function.
+ */
+export function freezeScene(root: HTMLElement, onDone?: () => void) {
   let cancelled = false;
   const done: Frozen[] = [];
   const dpr = Math.min(MAX_DPR, window.devicePixelRatio || 1);
@@ -172,6 +175,7 @@ export function freezeScene(root: HTMLElement) {
       f.svg.style.visibility = "hidden";
       done.push(f);
     }
+    if (!cancelled) onDone?.();
   })();
 
   return () => {
