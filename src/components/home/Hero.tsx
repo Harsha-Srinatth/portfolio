@@ -5,6 +5,7 @@ import { PERSON } from "@/components/portfolio/data";
 import { BotanicalScene } from "./hero/BotanicalScene";
 import { CompactCards, SceneCards } from "./hero/HangingCards";
 import { loadArt } from "./hero/loadArt";
+import { markHeroReady } from "./hero/ready";
 import type { TreeArt } from "./hero/treeArt";
 
 // keep in step with the `wide` variant in styles.css
@@ -42,10 +43,10 @@ function useWide() {
 let revealed = false;
 
 /** The sapling's growth takes this long from the first paint; it isn't cut short. */
-const SAPLING_GROWN = 1250;
+const SAPLING_GROWN = 800;
 
 /** Longest wait for the frames to calm down, on devices where they never quite do. */
-const SETTLE_LIMIT = 900;
+const SETTLE_LIMIT = 600;
 
 /** Run `cb` once a frame has been drawn: the first paint must never wait for the scene. */
 function afterNextFrame(cb: () => void) {
@@ -85,11 +86,11 @@ function afterPaint(cb: () => void) {
 
 // each pair of leaves opens as the stem passes it; x/y in px from the stem's base
 const LEAVES = [
-  { x: 27, y: 31, r: -158, d: 0.34, s: 1 },
-  { x: 29, y: 35, r: -20, d: 0.44, s: 0.95 },
-  { x: 27, y: 53, r: -146, d: 0.62, s: 0.82 },
-  { x: 29, y: 56, r: -32, d: 0.72, s: 0.78 },
-  { x: 28, y: 73, r: -82, d: 0.92, s: 0.72 },
+  { x: 27, y: 31, r: -158, d: 0.17, s: 1 },
+  { x: 29, y: 35, r: -20, d: 0.22, s: 0.95 },
+  { x: 27, y: 53, r: -146, d: 0.31, s: 0.82 },
+  { x: 29, y: 56, r: -32, d: 0.36, s: 0.78 },
+  { x: 28, y: 73, r: -82, d: 0.46, s: 0.72 },
 ];
 
 /**
@@ -148,6 +149,11 @@ export function Hero() {
   const [open, setOpen] = useState(revealed);
   const [glow, setGlow] = useState(!revealed);
 
+  // no reveal to wait for on a later mount
+  useEffect(() => {
+    if (revealed) markHeroReady();
+  }, []);
+
   // pause the breeze while the hero is out of view (see .hero-still)
   useEffect(() => {
     const el = section.current;
@@ -193,7 +199,11 @@ export function Hero() {
       {/* the ring of light along the growing circle's edge */}
       {glow && open && (
         <div aria-hidden className="pointer-events-none absolute inset-0 z-[5] overflow-hidden">
-          <div className="scene-ring" onAnimationEnd={() => setGlow(false)} />
+          <div className="scene-ring" onAnimationEnd={() => {
+              setGlow(false);
+              // the page below may start up now
+              markHeroReady();
+            }} />
         </div>
       )}
     </>
@@ -203,13 +213,14 @@ export function Hero() {
     <section ref={section} id="index" aria-label="Introduction" className="relative isolate flex min-h-[100svh] w-full flex-col overflow-hidden wide:block wide:h-[100svh] wide:min-h-[640px]">
       <Backdrop />
       {/* layout for both sizes is decided by CSS, so nothing shifts on hydration */}
-      <div className="absolute inset-0 hidden wide:block">
+      {/* .hero-depth / .hero-copy: the scroll-linked parting of tree and copy (styles.css) */}
+      <div className="hero-depth absolute inset-0 hidden wide:block">
         {glow && <Sapling leaving={open} />}
         {wide && scene}
       </div>
 
       <div className="pointer-events-none relative z-10 mx-auto w-full max-w-[1920px] px-6 pt-[5.5rem] md:px-12 md:pt-[8rem] wide:px-[clamp(3rem,3.8vw,5.5rem)] wide:pt-[clamp(7rem,21vh,13rem)]">
-        <div className="max-w-[44rem] wide:max-w-[min(46rem,41vw)]">
+        <div className="hero-copy max-w-[44rem] wide:max-w-[min(46rem,41vw)]">
           <h1 className="text-name text-[clamp(2.3rem,11.2vw,4.4rem)] md:text-[clamp(3.4rem,7.8vw,5.3rem)] wide:text-[clamp(3rem,5.4vw,7rem)]">
             <Line delay={0.15}>Harsha</Line>
             <Line delay={0.27}>Srinatth Ryali</Line>

@@ -1,7 +1,8 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { ArrowUpRight, Briefcase, Check, Copy, Mail, MapPin, Phone } from "lucide-react";
 
 import { PERSON } from "@/components/portfolio/data";
+import { LitText } from "./motion";
 import { Section } from "./Section";
 import { Card, GithubMark, IconChip, LinkedinMark } from "./ui";
 
@@ -28,6 +29,19 @@ function CopyButton({ value, label }: { value: string; label: string }) {
   );
 }
 
+/** The time where I am (India), so a visitor knows whether I am likely awake. Shown once the page is live. */
+function LocalTime() {
+  const [now, setNow] = useState<string | null>(null);
+  useEffect(() => {
+    const read = () => setNow(new Date().toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" }));
+    read();
+    const t = window.setInterval(read, 30_000);
+    return () => window.clearInterval(t);
+  }, []);
+  if (!now) return null;
+  return <span className="block text-[0.85rem] tabular-nums text-muted-foreground">{now} here right now</span>;
+}
+
 export function Contact() {
   const tel = PERSON.phone.replace(/\s+/g, "");
   const icon = (label: string): ReactNode =>
@@ -51,7 +65,7 @@ export function Contact() {
       <div className="grid gap-10 xl:grid-cols-12 xl:gap-8">
         <div className="xl:col-span-5">
           <p className="font-display max-w-[30rem] text-balance text-[clamp(1.8rem,3vw,2.7rem)] font-[340] leading-[1.15] tracking-[-0.02em]">
-            Have an idea, a difficult problem or a role in mind? I’d like to hear about it.
+            <LitText text="Have an idea, a difficult problem or a role in mind? I’d like to hear about it." />
           </p>
           <ul className="mt-8 space-y-4">
             <li className="flex items-center gap-3">
@@ -59,7 +73,10 @@ export function Contact() {
                 <Briefcase className="h-4 w-4" strokeWidth={1.6} />
               </IconChip>
               <span>
-                <span className="block text-[0.8rem] text-muted-foreground">Open to</span>
+                <span className="flex items-center gap-2 text-[0.8rem] text-muted-foreground">
+                  Open to
+                  <span className="pulse-dot" aria-hidden />
+                </span>
                 Backend, full-stack and AI engineering roles
               </span>
             </li>
@@ -70,6 +87,7 @@ export function Contact() {
               <span>
                 <span className="block text-[0.8rem] text-muted-foreground">Based in</span>
                 {PERSON.location}, India
+                <LocalTime />
               </span>
             </li>
           </ul>

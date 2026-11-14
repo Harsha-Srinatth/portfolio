@@ -1,21 +1,34 @@
-import { useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState, type ComponentType } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { recordVisitOnce } from "@/lib/visit";
 import { Header } from "@/components/home/Header";
 import { Hero } from "@/components/home/Hero";
-import { About } from "@/components/home/About";
-import { Work } from "@/components/home/Work";
-import { Path } from "@/components/home/Path";
-import { Skills } from "@/components/home/Skills";
-import { Recognition } from "@/components/home/Recognition";
-import { BuildLog } from "@/components/home/BuildLog";
-import { Contact } from "@/components/home/Contact";
-import { Footer } from "@/components/home/Footer";
+import { heroReady } from "@/components/home/hero/ready";
 import { Course } from "@/components/home/Section";
 import { useReveal } from "@/components/home/useReveal";
+import { usePointerGlow } from "@/components/home/motionEvents";
+import { Rail } from "@/components/home/Rail";
 import { LIKES_EVENT } from "@/components/home/likeStore";
 import { Toaster } from "@/components/home/Toast";
+
+/*
+ * Everything below the first screen. Its HTML arrives with the page as
+ * before, but its scripts load and start up (hydrate) only once the hero has
+ * finished arriving, one section at a time, so the tree's entrance has the
+ * main thread to itself. Scrolling or tapping starts them at once.
+ */
+function later<P>(load: () => Promise<ComponentType<P>>) {
+  return lazy(() => heroReady.then(load).then((c) => ({ default: c })));
+}
+const About = later(() => import("@/components/home/About").then((m) => m.About));
+const Work = later(() => import("@/components/home/Work").then((m) => m.Work));
+const Path = later(() => import("@/components/home/Path").then((m) => m.Path));
+const Skills = later(() => import("@/components/home/Skills").then((m) => m.Skills));
+const Recognition = later(() => import("@/components/home/Recognition").then((m) => m.Recognition));
+const BuildLog = later(() => import("@/components/home/BuildLog").then((m) => m.BuildLog));
+const Contact = later(() => import("@/components/home/Contact").then((m) => m.Contact));
+const Footer = later(() => import("@/components/home/Footer").then((m) => m.Footer));
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -40,6 +53,7 @@ function Index() {
   const [visitorCount, setVisitorCount] = useState<number | null>(null);
   const [hearts, setHearts] = useState<number | null>(null);
   useReveal();
+  usePointerGlow();
 
   // a like sent from the hero card updates the count shown in the footer
   useEffect(() => {
@@ -71,23 +85,41 @@ function Index() {
         Skip to content
       </a>
       <Header />
+      <Rail />
       <main className="relative w-full">
         <Hero />
-        <About />
+        <Suspense>
+          <About />
+        </Suspense>
         <Course />
-        <Work />
+        <Suspense>
+          <Work />
+        </Suspense>
         <Course />
-        <Path />
+        <Suspense>
+          <Path />
+        </Suspense>
         <Course />
-        <Skills />
+        <Suspense>
+          <Skills />
+        </Suspense>
         <Course />
-        <Recognition />
+        <Suspense>
+          <Recognition />
+        </Suspense>
         <Course />
-        <BuildLog />
+        <Suspense>
+          <BuildLog />
+        </Suspense>
         <Course />
-        <Contact />
+        <Suspense>
+          <Contact />
+        </Suspense>
+        <Course />
       </main>
-      <Footer visitorCount={visitorCount} hearts={hearts} onHeartsChange={setHearts} />
+      <Suspense>
+        <Footer visitorCount={visitorCount} hearts={hearts} onHeartsChange={setHearts} />
+      </Suspense>
       <Toaster />
     </>
   );

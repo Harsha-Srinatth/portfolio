@@ -3,6 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 
 import { GITHUB } from "@/components/portfolio/data";
 import type { GithubActivity } from "@/lib/github.server";
+import { CountUp } from "./motion";
 import { Card, GithubMark } from "./ui";
 import { useInView } from "./useInView";
 
@@ -71,7 +72,7 @@ function Calendar({ cols, monthAt, from, to, shown }: { cols: Cell[][]; monthAt:
               cell ? (
                 <span
                   key={r}
-                  className="aspect-square rounded-[3px]"
+                  className="contrib-cell aspect-square rounded-[3px]"
                   style={{ background: SHADES[cell.level] }}
                   title={shown ? `${cell.count ? cell.count : "No"} contribution${cell.count === 1 ? "" : "s"} on ${fmt(cell.date)}` : undefined}
                 />
@@ -84,6 +85,23 @@ function Calendar({ cols, monthAt, from, to, shown }: { cols: Cell[][]; monthAt:
       </div>
     </div>
   );
+}
+
+/** What the year's days add up to: days with activity, the busiest day, the longest run of days in a row. */
+function summarise(days: GithubActivity["days"]) {
+  let active = 0;
+  let best = { count: 0, date: "" };
+  let run = 0;
+  let streak = 0;
+  for (const d of [...days].sort((a, b) => a.date.localeCompare(b.date))) {
+    if (d.count > 0) {
+      active++;
+      run++;
+      streak = Math.max(streak, run);
+      if (d.count > best.count) best = { count: d.count, date: d.date };
+    } else run = 0;
+  }
+  return { active, best, streak };
 }
 
 /** Where phones split the year: the start of July, in weeks. */
@@ -118,18 +136,19 @@ export function Contributions() {
   const [ref, seen] = useInView<HTMLDivElement>({ once: true, margin: "0px 0px -15% 0px" });
   const grown = seen && !!shown;
   const grid = useMemo(() => weeks(year, shown?.days ?? null), [year, shown]);
+  const sum = useMemo(() => (shown ? summarise(shown.days) : null), [shown]);
   const profile = `https://github.com/${GITHUB.username}`;
 
   return (
     <div ref={nearRef}>
-    <Card className="p-5 sm:p-7 md:p-8">
+    <Card flat className="reveal p-5 sm:p-7 md:p-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-3">
           <span className="grid h-11 w-11 place-items-center rounded-xl bg-secondary">
             <GithubMark className="h-5 w-5" />
           </span>
           <p className="leading-tight" aria-live="polite">
-            <span className="font-display text-[1.75rem] font-[400] tabular-nums tracking-[-0.02em]">{shown ? shown.total.toLocaleString("en-IN") : "…"}</span>
+            <span className="font-display text-[1.75rem] font-[400] tabular-nums tracking-[-0.02em]">{shown ? <CountUp key={year} value={shown.total} /> : "…"}</span>
             <span className="ml-2 text-[0.95rem] text-muted-foreground">contributions in {year}</span>
           </p>
         </div>
@@ -168,6 +187,25 @@ export function Contributions() {
           <Calendar cols={grid.cols} monthAt={grid.monthAt} from={HALF} to={grid.cols.length} shown={!!shown} />
         </div>
       </div>
+
+      {/* the same days, added up */}
+      {sum && sum.active > 0 && (
+        <dl key={year} className="mt-6 grid grid-cols-3 gap-3 border-t border-border pt-5 sm:max-w-[34rem]">
+          {[
+            { label: "Active days", value: sum.active, note: "" },
+            { label: "Busiest day", value: sum.best.count, note: fmt(sum.best.date) },
+            { label: "Longest streak", value: sum.streak, note: sum.streak === 1 ? "day" : "days" },
+          ].map((s, j) => (
+            <div key={s.label} className="pop" style={{ ["--j" as string]: j * 3 }}>
+              <dt className="text-[0.78rem] text-muted-foreground">{s.label}</dt>
+              <dd className="mt-0.5 flex items-baseline gap-1.5">
+                <CountUp value={s.value} className="font-display text-[1.45rem] tracking-[-0.02em]" />
+                {s.note && <span className="text-[0.8rem] text-muted-foreground">{s.note}</span>}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-[0.85rem] text-muted-foreground">
         <span>

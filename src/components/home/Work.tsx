@@ -1,8 +1,9 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, LazyMotion, m, useReducedMotion } from "motion/react";
 import { ArrowRight, ArrowUpRight, CircleCheck, Layers, LayoutDashboard, Sparkles } from "lucide-react";
 
 import { PROJECTS, type Project } from "@/components/portfolio/data";
+import { PROJECT_EVENT } from "./motionEvents";
 import { ProjectArt } from "./ProjectArt";
 import { Section } from "./Section";
 import { Card, Chip, GithubMark, IconChip, NamedIcon } from "./ui";
@@ -40,8 +41,8 @@ function Featured({ p }: { p: Project }) {
             {!p.url && !p.repo && <p className="text-[0.9rem] text-muted-foreground">Demo and source available on request.</p>}
           </div>
           <ul className="mt-9 grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-4">
-            {p.highlights.map((h) => (
-              <li key={h.label} className="flex flex-col gap-2 text-[0.88rem] leading-snug">
+            {p.highlights.map((h, j) => (
+              <li key={h.label} className="pop flex flex-col gap-2 text-[0.88rem] leading-snug" style={{ ["--j" as string]: j * 2 }}>
                 <span className="text-accent">
                   <NamedIcon name={h.icon} className="h-5 w-5" />
                 </span>
@@ -73,8 +74,8 @@ function Featured({ p }: { p: Project }) {
             <h4 className="text-[0.95rem] font-medium">Key features</h4>
           </div>
           <ul className="mt-4 space-y-2.5">
-            {p.features.map((f) => (
-              <li key={f} className="flex gap-2.5 text-[0.95rem] leading-snug text-foreground/80">
+            {p.features.map((f, j) => (
+              <li key={f} className="pop flex gap-2.5 text-[0.95rem] leading-snug text-foreground/80" style={{ ["--j" as string]: j * 2 + 2 }}>
                 <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-accent" strokeWidth={1.7} aria-hidden />
                 {f}
               </li>
@@ -89,8 +90,8 @@ function Featured({ p }: { p: Project }) {
             <h4 className="text-[0.95rem] font-medium">Tech stack</h4>
           </div>
           <ul className="mt-4 flex flex-wrap gap-2">
-            {p.stack.map((t) => (
-              <li key={t}>
+            {p.stack.map((t, j) => (
+              <li key={t} className="pop" style={{ ["--j" as string]: j + 3 }}>
                 <Chip>{t}</Chip>
               </li>
             ))}
@@ -107,6 +108,16 @@ export function Work() {
   const view = useRef<HTMLDivElement>(null);
   const current = PROJECTS.find((p) => p.id === active) ?? PROJECTS[0];
 
+  // another section (a skill chip) can ask for a project to be shown
+  useEffect(() => {
+    const onShow = (e: Event) => {
+      const id = (e as CustomEvent<string>).detail;
+      if (PROJECTS.some((p) => p.id === id)) setActive(id);
+    };
+    window.addEventListener(PROJECT_EVENT, onShow);
+    return () => window.removeEventListener(PROJECT_EVENT, onShow);
+  }, []);
+
   // picking a project brings its full view into sight, if it is not already
   const pick = (id: string) => {
     setActive(id);
@@ -121,7 +132,7 @@ export function Work() {
   return (
     <Section id="constellation" title="Work" note="Selected projects. Pick one to see how it was built.">
       <div ref={view} className="scroll-mt-6">
-        <Card className="p-6 sm:p-8 lg:p-10">
+        <Card flat className="reveal p-6 sm:p-8 lg:p-10">
           <LazyMotion features={motionFeatures}>
             <AnimatePresence mode="wait" initial={false}>
               <m.div
@@ -144,9 +155,9 @@ export function Work() {
         {PROJECTS.map((p, i) => {
           const on = p.id === active;
           return (
-            <li key={p.id} className="reveal relative">
+            <li key={p.id} className="reveal relative" style={{ ["--i" as string]: i }}>
               <div
-                className={`flex h-full flex-col rounded-[1.4rem] border p-5 transition-[border-color,background-color,box-shadow] duration-300 ${
+                className={`glow flex h-full flex-col rounded-[1.4rem] border p-5 ${
                   on ? "border-accent bg-card shadow-[0_18px_40px_-28px_rgb(61_92_73/0.6)] ring-1 ring-accent/40" : "border-border bg-card/55 hover:border-foreground/30"
                 }`}
               >

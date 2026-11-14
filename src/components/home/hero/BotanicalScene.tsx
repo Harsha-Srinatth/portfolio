@@ -1,7 +1,8 @@
-import { memo, useEffect, useRef, type CSSProperties } from "react";
+import { memo, useEffect, useRef, useSyncExternalStore, type CSSProperties } from "react";
 
 import { useTheme } from "@/lib/theme";
 import { freezeScene } from "./freeze";
+import { heroReady } from "./ready";
 
 import { SHADE_TRANSFORM, VIEW, sceneUnit as u, type Shade, type Spray, type TreeArt, type Tuft } from "./treeArt";
 
@@ -75,10 +76,10 @@ function TuftLayer({ t, alt }: { t: Tuft; alt?: boolean }) {
 function WallDefs({ id }: { id: string }) {
   return (
     <>
-      <filter id={`fleck-blur${id}`} filterUnits="userSpaceOnUse" x="-800" y="-600" width="3200" height="1800">
+      <filter id={`fleck-blur${id}`} x="-30%" y="-30%" width="160%" height="160%">
         <feGaussianBlur stdDeviation="3" />
       </filter>
-      <filter id={`dapple-blur${id}`} filterUnits="userSpaceOnUse" x="-800" y="-400" width="2900" height="1600">
+      <filter id={`dapple-blur${id}`} x="-30%" y="-30%" width="160%" height="160%">
         <feGaussianBlur stdDeviation="3.4" />
       </filter>
       {/* the shadow falls on the wall only, not the ground */}
@@ -132,6 +133,111 @@ function SprayStill({ s }: { s: Spray }) {
   );
 }
 
+/**
+ * Falling leaves: where each lets go, how far it drifts with the breeze and
+ * how far it falls (scene units), landing on the open floor left of the mound.
+ * The delays are positive: once the page has finished loading the first leaf
+ * lets go from the branch at once and the others follow, each from the top,
+ * never one already halfway down.
+ */
+const FALLING = [
+  { x: 700, y: 340, drift: 90, fall: 534, dur: 23, delay: 0.3 },
+  { x: 760, y: 250, drift: 85, fall: 616, dur: 27, delay: 6, alt: true },
+  { x: 800, y: 420, drift: 80, fall: 450, dur: 29, delay: 12.5, alt: true },
+  { x: 640, y: 300, drift: 60, fall: 576, dur: 34, delay: 18, fringe: true },
+];
+
+/*
+ * Whether the scene's small living details have started. They are left out
+ * entirely until the page has finished loading (see `useLifeAfterLoad`), so
+ * the first seconds carry no extra layers or animations; then they start
+ * once, for the rest of the visit. Kept outside React state so turning them
+ * on re-renders only them, not the ~200 memoised layers of the tree.
+ */
+let alive = false;
+const lifeListeners = new Set<() => void>();
+function startLife() {
+  if (alive) return;
+  alive = true;
+  lifeListeners.forEach((l) => l());
+}
+function useAlive() {
+  return useSyncExternalStore(
+    (l) => {
+      lifeListeners.add(l);
+      return () => lifeListeners.delete(l);
+    },
+    () => alive,
+    () => false,
+  );
+}
+
+/**
+ * Starts the living details once loading is over: the reveal has finished,
+ * the sections below have started up, the desktop scene has been saved as
+ * images (that work comes in idle moments after the reveal), and the browser
+ * then has a free moment. If the snapshots are held up (they wait while the
+ * visitor is scrolling), the leaves start anyway a little later.
+ */
+let markFrozen: () => void = () => {};
+/** Resolves the first time the desktop scene has been saved as images. */
+const sceneFrozen = new Promise<void>((res) => (markFrozen = res));
+
+function useLifeAfterLoad(settled: boolean, snapshot: boolean) {
+  useEffect(() => {
+    if (!settled || alive) return;
+    let live = true;
+    let idle = 0;
+    const fallback = window.setTimeout(markFrozen, 4000);
+    void Promise.all([heroReady, snapshot ? sceneFrozen : Promise.resolve()]).then(() => {
+      if (!live) return;
+      idle = "requestIdleCallback" in window ? window.requestIdleCallback(startLife, { timeout: 1500 }) : window.setTimeout(startLife, 300);
+    });
+    return () => {
+      live = false;
+      window.clearTimeout(fallback);
+      if ("cancelIdleCallback" in window) window.cancelIdleCallback(idle);
+      window.clearTimeout(idle);
+    };
+  }, [settled, snapshot]);
+}
+
+/** Fireflies (dark theme only): the box each one wanders round, in scene units. */
+const FIREFLIES = [
+  [620, 470, 150, 110],
+  [700, 640, 130, 90],
+  [860, 650, 150, 100],
+  [1000, 620, 110, 90],
+  [620, 770, 160, 70],
+  [900, 790, 140, 60],
+  [1300, 800, 120, 50],
+  [1620, 740, 100, 70],
+];
+
+/** Small living details over the tree: leaves letting go, and fireflies at night (styles.css). */
+function SceneLife() {
+  if (!useAlive()) return null;
+  return (
+    <>
+      {FALLING.map((l, i) => (
+        <div
+          key={`l${i}`}
+          aria-hidden
+          className={`leaf-fall ${l.alt ? "tone-b" : ""} ${l.fringe ? "scene-fringe" : ""}`}
+          style={{ ...place(l.x, l.y, l.drift, l.fall), ...sway(l.dur, l.delay) }}
+        >
+          <i />
+        </div>
+      ))}
+      {FIREFLIES.map(([x, y, w, h], i) => (
+        <div key={`f${i}`} aria-hidden className="firefly" style={{ ...place(x, y, w, h), ...sway(27 + ((i * 5) % 13), -i * 4.3) }}>
+          <i />
+        </div>
+      ))}
+    </>
+  );
+}
+
 /** How long after the scene has settled (the reveal is over) to snapshot the art. */
 const FREEZE_AFTER = 900;
 
@@ -155,16 +261,18 @@ const Layers = memo(function Layers({ art, children }: { art: TreeArt; children?
             <stop offset="0" stopColor="var(--sun-glow)" />
             <stop offset="1" stopColor="var(--sun-glow)" stopOpacity="0" />
           </radialGradient>
+          {/* each blur works over its own shape plus a margin, not a fixed
+              area many times its size: the same picture for far less drawing */}
           {/* shadow softness grows with the distance between the caster and
               the wall: the whole crown is a broad blur, branches less so,
               single leaves least (but never crisp) */}
-          <filter id="umbra-blur" filterUnits="userSpaceOnUse" x="-800" y="-600" width="3200" height="1800">
+          <filter id="umbra-blur" x="-30%" y="-30%" width="160%" height="160%">
             <feGaussianBlur stdDeviation="26" />
           </filter>
-          <filter id="wood-blur" filterUnits="userSpaceOnUse" x="-800" y="-600" width="3200" height="1800">
+          <filter id="wood-blur" x="-30%" y="-30%" width="160%" height="160%">
             <feGaussianBlur stdDeviation="6" />
           </filter>
-          <filter id="off-frame-blur" filterUnits="userSpaceOnUse" x="-800" y="-600" width="3200" height="1800">
+          <filter id="off-frame-blur" x="-30%" y="-30%" width="160%" height="160%">
             <feGaussianBlur stdDeviation="7" />
           </filter>
           <WallDefs id="" />
@@ -201,7 +309,7 @@ const Layers = memo(function Layers({ art, children }: { art: TreeArt; children?
           <clipPath id="wood-clip">
             <path d={art.wood} />
           </clipPath>
-          <filter id="bark-soft" filterUnits="userSpaceOnUse" x="0" y="-200" width="1900" height="1200">
+          <filter id="bark-soft" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="3.5" />
           </filter>
           <filter id="shadow-soft" filterUnits="userSpaceOnUse" x="600" y="600" width="1300" height="400">
@@ -288,6 +396,8 @@ const Layers = memo(function Layers({ art, children }: { art: TreeArt; children?
         <SprayLayer key={`f${i}`} s={s} alt={i % 2 === 0} />
       ))}
 
+      <SceneLife />
+
       {children}
     </>
   );
@@ -302,6 +412,7 @@ const Layers = memo(function Layers({ art, children }: { art: TreeArt; children?
 export function BotanicalScene({ art, snapshot = false, settled = true, children }: { art: TreeArt; snapshot?: boolean; settled?: boolean; children?: React.ReactNode }) {
   const root = useRef<HTMLDivElement>(null);
   const theme = useTheme();
+  useLifeAfterLoad(settled, snapshot);
 
   // Keep the drawn scene as bitmaps (see freeze.ts). A theme change or a
   // resize puts the live vector art back at once and snapshots it again
@@ -311,7 +422,7 @@ export function BotanicalScene({ art, snapshot = false, settled = true, children
     // never while the reveal is still playing: saving the art is heavy work
     if (!el || !snapshot || !settled) return;
     let thaw: (() => void) | null = null;
-    let timer = window.setTimeout(() => (thaw = freezeScene(el)), FREEZE_AFTER);
+    let timer = window.setTimeout(() => (thaw = freezeScene(el, markFrozen)), FREEZE_AFTER);
     let size = `${el.clientWidth}x${el.clientHeight}`;
     const ro = new ResizeObserver(() => {
       const next = `${el.clientWidth}x${el.clientHeight}`;
@@ -320,7 +431,7 @@ export function BotanicalScene({ art, snapshot = false, settled = true, children
       thaw?.();
       thaw = null;
       clearTimeout(timer);
-      timer = window.setTimeout(() => (thaw = freezeScene(el)), 600);
+      timer = window.setTimeout(() => (thaw = freezeScene(el, markFrozen)), 600);
     });
     ro.observe(el);
     return () => {
