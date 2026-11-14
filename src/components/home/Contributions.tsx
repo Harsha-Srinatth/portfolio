@@ -217,7 +217,7 @@ export function Contributions() {
               </a>
             </>
           ) : shown?.languages.length ? (
-            `Mostly ${shown.languages.join(" and ")}${shown.repos ? `, ${shown.repos} public repositories` : ""}`
+            `Mostly ${shown.languages.join(" and ")}${shown.repos ? `, ${shown.repos} public repositories` : ""}${GITHUB.accounts.length > 1 ? ". Personal and internship accounts combined." : ""}`
           ) : (
             " "
           )}

@@ -42,7 +42,13 @@ export const PERSON = {
 };
 
 export const GITHUB = {
+  /** the profile the site links to */
   username: "Harsha-Srinatth",
+  /**
+   * Every account whose activity counts: personal and internship. The graph
+   * on the site adds them together, day by day, into one calendar.
+   */
+  accounts: ["Harsha-Srinatth", "Harsha-Alchemist"],
   totalContributions: 290,
   year: 2025,
   repoCount: 12,
