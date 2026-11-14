@@ -130,7 +130,23 @@ async function freezeOne(svg: SVGSVGElement, dpr: number): Promise<Frozen | null
 }
 
 const nextIdle = () =>
-  new Promise<void>((res) => ("requestIdleCallback" in window ? window.requestIdleCallback(() => res(), { timeout: 300 }) : setTimeout(res, 16)));
+  new Promise<void>((res) => ("requestIdleCallback" in window ? window.requestIdleCallback(() => res(), { timeout: 600 }) : setTimeout(res, 32)));
+
+// Snapshotting is background work: it stands aside while the visitor is
+// scrolling or pointing at things, and picks up again once they pause.
+let lastInput = 0;
+if (typeof window !== "undefined") {
+  const touch = () => (lastInput = performance.now());
+  for (const e of ["scroll", "wheel", "pointermove", "pointerdown", "touchmove", "keydown"]) window.addEventListener(e, touch, { passive: true, capture: true });
+}
+const QUIET = 350;
+async function whenQuiet() {
+  for (;;) {
+    const wait = lastInput + QUIET - performance.now();
+    if (wait <= 0) return;
+    await new Promise((res) => setTimeout(res, wait));
+  }
+}
 
 /** Snapshot every `svg[data-freeze]` under `root`, a few at a time in idle moments. Returns a thaw function. */
 export function freezeScene(root: HTMLElement) {
@@ -141,18 +157,20 @@ export function freezeScene(root: HTMLElement) {
 
   (async () => {
     const svgs = [...root.querySelectorAll<SVGSVGElement>("svg[data-freeze]")];
-    for (let i = 0; i < svgs.length && !cancelled; i += 8) {
+    // one at a time, each in an idle moment of its own: eight at once made a
+    // run of long stalls right after the page had appeared
+    for (let i = 0; i < svgs.length && !cancelled; i++) {
+      await whenQuiet();
       await nextIdle();
-      const batch = await Promise.all(svgs.slice(i, i + 8).map((s) => freezeOne(s, dpr)));
       if (cancelled) return;
+      const f = await freezeOne(svgs[i], dpr);
+      if (cancelled) return;
+      if (!f) continue;
       // swap in the same frame: the canvas goes in, the vector art goes out
-      for (const f of batch) {
-        if (!f) continue;
-        f.svg.after(f.canvas);
-        // hidden, not removed: its definitions may still be referenced
-        f.svg.style.visibility = "hidden";
-        done.push(f);
-      }
+      f.svg.after(f.canvas);
+      // hidden, not removed: its definitions may still be referenced
+      f.svg.style.visibility = "hidden";
+      done.push(f);
     }
   })();
 

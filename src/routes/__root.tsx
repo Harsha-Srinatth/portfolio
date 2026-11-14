@@ -9,6 +9,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+import treeWorkerUrl from "../components/home/hero/treeWorker.ts?worker&url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -107,6 +108,13 @@ export const Route = createRootRoute({
 // Keep the key in sync with THEME_KEY in src/lib/theme.ts.
 const THEME_BOOT = `(function(){try{if(localStorage.getItem("rhs.theme")==="dark"){var r=document.documentElement;r.classList.add("dark");r.style.colorScheme="dark";}}catch(e){}})();`;
 
+// Starts drawing the hero's tree in a worker while the HTML is still arriving,
+// instead of after the page's scripts have loaded and started (which is when
+// the main thread is at its busiest, and the worker used to wait behind it).
+// loadArt.ts picks the result up from window.__tree. Keep the media query in
+// step with WIDE in Hero.tsx, and the densities with densityFor() there.
+const TREE_BOOT = `(function(){try{var d=matchMedia("(min-width: 1024px) and (min-aspect-ratio: 5/4)").matches?1:0.8;var w=new Worker(${JSON.stringify(treeWorkerUrl)}${import.meta.env.DEV ? ',{type:"module"}' : ""});window.__tree={density:d,art:new Promise(function(res,rej){w.onmessage=function(e){res(e.data);w.terminate()};w.onerror=function(){rej(new Error("tree worker"));w.terminate()}})};window.__tree.art.catch(function(){});w.postMessage(d)}catch(e){}})();`;
+
 // The wall colour (--background in styles.css), from the very first frame.
 const FIRST_FRAME = `html{background:#efe8dd}html.dark{background:#15120e}`;
 
@@ -116,6 +124,7 @@ function RootShell({ children }: { children: ReactNode }) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
         <style dangerouslySetInnerHTML={{ __html: FIRST_FRAME }} />
+        <script dangerouslySetInnerHTML={{ __html: TREE_BOOT }} />
         <HeadContent />
       </head>
       <body>

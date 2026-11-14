@@ -75,10 +75,10 @@ function TuftLayer({ t, alt }: { t: Tuft; alt?: boolean }) {
 function WallDefs({ id }: { id: string }) {
   return (
     <>
-      <filter id={`fleck-blur${id}`} filterUnits="userSpaceOnUse" x="-800" y="-600" width="3200" height="1800">
+      <filter id={`fleck-blur${id}`} x="-30%" y="-30%" width="160%" height="160%">
         <feGaussianBlur stdDeviation="3" />
       </filter>
-      <filter id={`dapple-blur${id}`} filterUnits="userSpaceOnUse" x="-800" y="-400" width="2900" height="1600">
+      <filter id={`dapple-blur${id}`} x="-30%" y="-30%" width="160%" height="160%">
         <feGaussianBlur stdDeviation="3.4" />
       </filter>
       {/* the shadow falls on the wall only, not the ground */}
@@ -132,6 +132,52 @@ function SprayStill({ s }: { s: Spray }) {
   );
 }
 
+/**
+ * Falling leaves: where each lets go, how far it drifts with the breeze and
+ * how far it falls (scene units), landing on the open floor left of the mound.
+ */
+const FALLING = [
+  { x: 700, y: 340, drift: 90, fall: 534, dur: 23, delay: -3 },
+  { x: 800, y: 420, drift: 80, fall: 450, dur: 29, delay: -14, alt: true },
+  { x: 640, y: 300, drift: 60, fall: 576, dur: 34, delay: -24, fringe: true },
+  { x: 760, y: 250, drift: 85, fall: 616, dur: 27, delay: -9, alt: true },
+];
+
+/** Fireflies (dark theme only): the box each one wanders round, in scene units. */
+const FIREFLIES = [
+  [620, 470, 150, 110],
+  [700, 640, 130, 90],
+  [860, 650, 150, 100],
+  [1000, 620, 110, 90],
+  [620, 770, 160, 70],
+  [900, 790, 140, 60],
+  [1300, 800, 120, 50],
+  [1620, 740, 100, 70],
+];
+
+/** Small living details over the tree: leaves letting go, and fireflies at night (styles.css). */
+function SceneLife() {
+  return (
+    <>
+      {FALLING.map((l, i) => (
+        <div
+          key={`l${i}`}
+          aria-hidden
+          className={`leaf-fall ${l.alt ? "tone-b" : ""} ${l.fringe ? "scene-fringe" : ""}`}
+          style={{ ...place(l.x, l.y, l.drift, l.fall), ...sway(l.dur, l.delay) }}
+        >
+          <i />
+        </div>
+      ))}
+      {FIREFLIES.map(([x, y, w, h], i) => (
+        <div key={`f${i}`} aria-hidden className="firefly" style={{ ...place(x, y, w, h), ...sway(27 + ((i * 5) % 13), -i * 4.3) }}>
+          <i />
+        </div>
+      ))}
+    </>
+  );
+}
+
 /** How long after the scene has settled (the reveal is over) to snapshot the art. */
 const FREEZE_AFTER = 900;
 
@@ -155,16 +201,18 @@ const Layers = memo(function Layers({ art, children }: { art: TreeArt; children?
             <stop offset="0" stopColor="var(--sun-glow)" />
             <stop offset="1" stopColor="var(--sun-glow)" stopOpacity="0" />
           </radialGradient>
+          {/* each blur works over its own shape plus a margin, not a fixed
+              area many times its size: the same picture for far less drawing */}
           {/* shadow softness grows with the distance between the caster and
               the wall: the whole crown is a broad blur, branches less so,
               single leaves least (but never crisp) */}
-          <filter id="umbra-blur" filterUnits="userSpaceOnUse" x="-800" y="-600" width="3200" height="1800">
+          <filter id="umbra-blur" x="-30%" y="-30%" width="160%" height="160%">
             <feGaussianBlur stdDeviation="26" />
           </filter>
-          <filter id="wood-blur" filterUnits="userSpaceOnUse" x="-800" y="-600" width="3200" height="1800">
+          <filter id="wood-blur" x="-30%" y="-30%" width="160%" height="160%">
             <feGaussianBlur stdDeviation="6" />
           </filter>
-          <filter id="off-frame-blur" filterUnits="userSpaceOnUse" x="-800" y="-600" width="3200" height="1800">
+          <filter id="off-frame-blur" x="-30%" y="-30%" width="160%" height="160%">
             <feGaussianBlur stdDeviation="7" />
           </filter>
           <WallDefs id="" />
@@ -201,7 +249,7 @@ const Layers = memo(function Layers({ art, children }: { art: TreeArt; children?
           <clipPath id="wood-clip">
             <path d={art.wood} />
           </clipPath>
-          <filter id="bark-soft" filterUnits="userSpaceOnUse" x="0" y="-200" width="1900" height="1200">
+          <filter id="bark-soft" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="3.5" />
           </filter>
           <filter id="shadow-soft" filterUnits="userSpaceOnUse" x="600" y="600" width="1300" height="400">
@@ -287,6 +335,8 @@ const Layers = memo(function Layers({ art, children }: { art: TreeArt; children?
       {front.map((s, i) => (
         <SprayLayer key={`f${i}`} s={s} alt={i % 2 === 0} />
       ))}
+
+      <SceneLife />
 
       {children}
     </>

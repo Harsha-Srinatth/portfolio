@@ -1,7 +1,8 @@
 import { useState, useSyncExternalStore } from "react";
-import { Heart } from "lucide-react";
+import { ArrowUp, Heart } from "lucide-react";
 
 import { Ground } from "./Ambient";
+import { CountUp } from "./motion";
 import { readLiked, sendLike, subscribeLiked } from "./likeStore";
 import { useInView } from "./useInView";
 
@@ -9,6 +10,23 @@ function ordinal(n: number) {
   const s = ["th", "st", "nd", "rd"];
   const v = n % 100;
   return n.toLocaleString("en-IN") + (s[(v - 20) % 10] ?? s[v] ?? s[0]);
+}
+
+// leaves and hearts thrown from the Like button, each with its own direction
+const BURST = Array.from({ length: 12 }, (_, i) => {
+  const a = (i / 12) * Math.PI * 2 + (i % 2) * 0.3;
+  const d = 46 + (i % 3) * 16;
+  return { dx: Math.cos(a) * d, dy: Math.sin(a) * d - 14, r: (i % 2 ? 1 : -1) * (90 + i * 20), c: ["#e5384f", "var(--leaf-4)", "var(--brass)", "var(--leaf-5)"][i % 4] };
+});
+
+function Burst() {
+  return (
+    <span aria-hidden className="burst pointer-events-none absolute left-7 top-1/2">
+      {BURST.map((b, i) => (
+        <i key={i} style={{ ["--dx" as string]: `${b.dx.toFixed(0)}px`, ["--dy" as string]: `${b.dy.toFixed(0)}px`, ["--r" as string]: `${b.r}deg`, ["--c" as string]: b.c }} />
+      ))}
+    </span>
+  );
 }
 
 type FooterProps = {
@@ -47,8 +65,8 @@ export function Footer({ visitorCount, hearts, onHeartsChange }: FooterProps) {
   };
 
   return (
-    <footer ref={ref} data-live={live} className="relative border-t border-border">
-      <div className="mx-auto grid max-w-[1680px] grid-cols-1 gap-12 px-6 py-20 md:px-12 lg:grid-cols-12 lg:px-16">
+    <footer ref={ref} data-live={live} className="relative">
+      <div className="mx-auto grid max-w-[1920px] grid-cols-1 gap-12 px-6 pb-10 pt-20 md:px-12 md:pb-14 lg:grid-cols-12 wide:px-[clamp(3rem,3.8vw,5.5rem)]">
         <div className="lg:col-span-4">
           <p className="font-display text-[clamp(1.6rem,2.4vw,2.2rem)] font-[360] leading-[1.15] tracking-[-0.015em]">
             Enjoyed the visit?
@@ -56,6 +74,12 @@ export function Footer({ visitorCount, hearts, onHeartsChange }: FooterProps) {
           <p className="mt-3 max-w-[22rem] text-[0.98rem] leading-relaxed text-muted-foreground">
             Tap the heart if you liked it. One tap is enough.
           </p>
+          <a href="#index" className="group mt-7 inline-flex items-center gap-3 text-[0.95rem] text-foreground/80 transition-colors hover:text-foreground">
+            <span aria-hidden className="grid h-10 w-10 place-items-center rounded-full border border-foreground/25 transition-[border-color,transform] duration-500 ease-[var(--ease-stone)] group-hover:-translate-y-1 group-hover:border-foreground/60">
+              <ArrowUp className="h-4 w-4" strokeWidth={1.6} />
+            </span>
+            <span className="link-underline">Back to the tree</span>
+          </a>
         </div>
 
         <div className="lg:col-span-8">
@@ -65,8 +89,9 @@ export function Footer({ visitorCount, hearts, onHeartsChange }: FooterProps) {
               onClick={() => void applaud()}
               disabled={liked || pending}
               aria-pressed={liked}
-              className="btn btn-line disabled:cursor-default"
+              className="btn btn-line relative disabled:cursor-default"
             >
+              {likedNow && <Burst />}
               <Heart className={`h-4 w-4 transition-[transform,color,fill] duration-500 ${liked ? "scale-110 fill-[#e5384f] text-[#e5384f]" : ""}`} strokeWidth={1.6} />
               {liked ? "Thank you" : pending ? "Sending…" : "Like"}
             </button>
@@ -75,7 +100,7 @@ export function Footer({ visitorCount, hearts, onHeartsChange }: FooterProps) {
                 <span className="text-muted-foreground">Loading likes…</span>
               ) : (
                 <>
-                  <span className="font-display text-[1.6rem] tabular-nums">{hearts.toLocaleString("en-IN")}</span>{" "}
+                  <CountUp value={hearts} duration={900} className="font-display text-[1.6rem]" />{" "}
                   <span className="text-muted-foreground">{hearts === 1 ? "person" : "people"} liked this</span>
                 </>
               )}

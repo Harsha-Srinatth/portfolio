@@ -59,9 +59,22 @@ export function NamedIcon({ name, className = "h-4 w-4" }: { name: string; class
 }
 
 /** The site's card: ivory on limestone, a hairline border, generous rounding. */
-export function Card({ children, className = "", style, as: Tag = "div" }: { children: ReactNode; className?: string; style?: CSSProperties; as?: "div" | "li" | "article" }) {
+export function Card({
+  children,
+  className = "",
+  style,
+  as: Tag = "div",
+  flat = false,
+}: {
+  children: ReactNode;
+  className?: string;
+  style?: CSSProperties;
+  as?: "div" | "li" | "article";
+  /** large panels stay put: no lift or pointer light */
+  flat?: boolean;
+}) {
   return (
-    <Tag className={`rounded-[1.4rem] border border-border bg-card ${className}`} style={style}>
+    <Tag className={`rounded-[1.4rem] border border-border bg-card ${flat ? "" : "glow"} ${className}`} style={style}>
       {children}
     </Tag>
   );

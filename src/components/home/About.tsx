@@ -4,10 +4,13 @@ import { Award, Code2, FileText, GraduationCap, MapPin, type LucideIcon } from "
 import { BEYOND_CODE, PERSON } from "@/components/portfolio/data";
 import { ResumeViewer } from "@/components/portfolio/ResumeViewer";
 import { LeafLight } from "./Ambient";
+import { CountUp, LitText } from "./motion";
 import { Contributions } from "./Contributions";
 import { HobbyArt } from "./HobbyArt";
 import { Section } from "./Section";
 import { Card, GithubMark, IconChip, LinkedinMark } from "./ui";
+
+const CGPA = 8.75;
 
 const FACTS: { icon: LucideIcon; label: string; value: string }[] = [
   { icon: MapPin, label: "Based in", value: `${PERSON.location}, India` },
@@ -31,7 +34,9 @@ export function About() {
     >
       <div className="grid gap-10 lg:grid-cols-12 lg:gap-8">
         <div className="lg:col-span-5">
-          <p className="font-display max-w-[34rem] text-pretty text-[clamp(1.45rem,2.1vw,1.95rem)] font-[350] leading-[1.38] tracking-[-0.005em]">{lead}</p>
+          <p className="font-display max-w-[34rem] text-pretty text-[clamp(1.45rem,2.1vw,1.95rem)] font-[350] leading-[1.38] tracking-[-0.005em]">
+            <LitText text={lead} />
+          </p>
           <p className="mt-5 max-w-[32rem] text-pretty text-[1.02rem] leading-[1.7] text-foreground/70">{more}</p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <button type="button" onClick={() => setResumeOpen(true)} className="btn btn-solid">
@@ -53,14 +58,29 @@ export function About() {
 
         <ul className="grid grid-cols-2 content-start gap-3 sm:gap-4 lg:col-span-7">
           {FACTS.map(({ icon: Icon, label, value }, i) => (
-            <Card as="li" key={label} className="reveal flex flex-col items-start gap-3 p-4 sm:flex-row sm:gap-4 sm:p-5" style={{ ["--i" as string]: i % 2 }}>
+            <Card as="li" key={label} className="reveal relative flex flex-col items-start gap-3 p-4 sm:flex-row sm:gap-4 sm:p-5" style={{ ["--i" as string]: i % 2 }}>
               <IconChip>
                 <Icon className="h-5 w-5" strokeWidth={1.6} />
               </IconChip>
-              <div>
+              <div className="min-w-0 flex-1">
                 <p className="text-[0.82rem] text-muted-foreground">{label}</p>
-                <p className="mt-1 text-[0.92rem] leading-snug sm:text-[1rem]">{value}</p>
+                <p className="mt-1 text-[0.92rem] leading-snug sm:text-[1rem]">
+                  {label === "CGPA" ? (
+                    <>
+                      <CountUp value={CGPA} decimals={2} className="font-display text-[1.35rem] sm:text-[1.5rem]" /> / 10
+                    </>
+                  ) : (
+                    value
+                  )}
+                </p>
               </div>
+              {/* the score as a gauge, drawn round as the card arrives */}
+              {label === "CGPA" && (
+                <svg viewBox="0 0 44 44" aria-hidden className="h-12 w-12 shrink-0 -rotate-90 self-center max-sm:absolute max-sm:right-4 max-sm:top-4 max-sm:h-10 max-sm:w-10">
+                  <circle cx="22" cy="22" r="18" fill="none" stroke="var(--secondary)" strokeWidth="4" />
+                  <circle className="ring-arc" cx="22" cy="22" r="18" fill="none" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round" pathLength={100} strokeDasharray={`${CGPA * 10} 100`} />
+                </svg>
+              )}
             </Card>
           ))}
         </ul>
@@ -75,9 +95,9 @@ export function About() {
         <p className="mt-2 text-[0.98rem] text-muted-foreground">What I do when I’m not building.</p>
         <ul className="mt-7 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
           {BEYOND_CODE.map((h, i) => (
-            <li key={h.key} className="reveal relative overflow-hidden rounded-[1.4rem] border border-border bg-card" style={{ ["--i" as string]: i % 4 }}>
+            <li key={h.key} className="hobby glow reveal relative overflow-hidden rounded-[1.4rem] border border-border bg-card" style={{ ["--i" as string]: i % 4 }}>
               {/* exactly the pictures' 4:3, so the turning record lines up */}
-              <div className="aspect-[4/3]">
+              <div className="hobby-art aspect-[4/3]">
                 <HobbyArt kind={h.key} />
               </div>
               <span className="absolute left-4 top-3.5 text-[0.78rem] tabular-nums text-foreground/55">{String(i + 1).padStart(2, "0")}</span>

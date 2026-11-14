@@ -41,7 +41,7 @@ function Dashboard() {
       {block(S.x + 78, S.y + 92, 184, 110, "var(--card)")}
       <rect x={S.x + 78} y={S.y + 92} width="184" height="110" rx="6" fill="none" stroke="var(--border)" />
       {bars.map((h, i) => (
-        <rect key={i} x={S.x + 92 + i * 20} y={S.y + 190 - h} width="11" height={h} rx="3" fill="var(--accent)" opacity={0.45 + i * 0.07} />
+        <rect key={i} className="art-bar" style={{ ["--j" as string]: i }} x={S.x + 92 + i * 20} y={S.y + 190 - h} width="11" height={h} rx="3" fill="var(--accent)" opacity={0.45 + i * 0.07} />
       ))}
       {block(S.x + 272, S.y + 92, 82, 110, "var(--card)")}
       <rect x={S.x + 272} y={S.y + 92} width="82" height="110" rx="6" fill="none" stroke="var(--border)" />

@@ -17,7 +17,7 @@ export function Path() {
         {STRATA.map((s, i) => {
           const Icon = ICONS[i] ?? Layers;
           return (
-            <Card as="li" key={s.role} className="reveal relative flex flex-col p-6 md:p-7" style={{ ["--i" as string]: i }}>
+            <Card as="li" key={s.role} className="reveal with-vine relative flex flex-col p-6 md:p-7" style={{ ["--i" as string]: i }}>
               <div className="flex items-center justify-between gap-3">
                 <IconChip>
                   <Icon className="h-5 w-5" strokeWidth={1.6} />
@@ -28,11 +28,18 @@ export function Path() {
                 </Chip>
               </div>
               <h3 className="font-display mt-6 text-[1.5rem] font-[390] leading-[1.15] tracking-[-0.01em]">{s.role}</h3>
-              <p className="mt-1 text-[0.88rem] text-muted-foreground">{s.org}</p>
+              <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.88rem] text-muted-foreground">
+                {s.org}
+                {/* still going: each stage is ongoing */}
+                <span className="inline-flex items-center gap-2 text-accent">
+                  <span className="pulse-dot" aria-hidden />
+                  {s.depthLabel}
+                </span>
+              </p>
               <p className="mt-4 text-pretty text-[0.97rem] leading-[1.6] text-foreground/75">{s.arc}</p>
               <ul className="mt-auto flex flex-wrap gap-1.5 pt-6">
-                {s.artifacts.map((a) => (
-                  <li key={a}>
+                {s.artifacts.map((a, j) => (
+                  <li key={a} className="chip-pop" style={{ ["--j" as string]: j + i * 6 }}>
                     <Chip className="!text-[0.78rem]">{a}</Chip>
                   </li>
                 ))}
