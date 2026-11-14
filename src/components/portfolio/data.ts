@@ -20,7 +20,7 @@ export const PERSON = {
   location: "Bhimavaram, Andhra Pradesh",
   education: "B.Tech CSBS (Computer Science & Business Systems) — 8.75 / 10 CGPA",
   also: "Music · Lo-fi · Ambient · Instrumental",
-  resumeUrl: "/Harsha_Res-Aug26.pdf",
+  resumeUrl: "/Harsha_Res_Nov.pdf",
   // Hero profile photo: IMG_20261025_112346.jpg, pre-cropped to the framing
   // that was set for it (object-position center 42%, zoom 1.38) and shrunk to
   // 560 px, so the page does not ship the ~700 KB original.

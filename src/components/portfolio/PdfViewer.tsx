@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Download, X } from "lucide-react";
 
 type PdfViewerProps = {
@@ -28,7 +29,11 @@ export function PdfViewer({ open, onClose, src, title, downloadName }: PdfViewer
 
   if (!open) return null;
 
-  return (
+  // Drawn on <body>, not where it is used: the sections it is opened from are
+  // clipped and contained (content-visibility, overflow), which would turn
+  // this full-screen overlay into a box inside the section, and keep it under
+  // the header. It only renders once opened, so it never runs on the server.
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex flex-col bg-background/95 backdrop-blur-md" role="dialog" aria-modal="true" aria-label={title}>
       <div className="flex items-center justify-between gap-4 border-b border-border bg-card/80 px-4 py-3 md:px-6">
         <div>
@@ -62,6 +67,7 @@ export function PdfViewer({ open, onClose, src, title, downloadName }: PdfViewer
           className="h-full w-full rounded-2xl border border-border bg-white shadow-2xl"
         />
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
