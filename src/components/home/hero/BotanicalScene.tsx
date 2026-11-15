@@ -191,12 +191,14 @@ function useLifeAfterLoad(settled: boolean, snapshot: boolean) {
     const fallback = window.setTimeout(markFrozen, 4000);
     void Promise.all([heroReady, snapshot ? sceneFrozen : Promise.resolve()]).then(() => {
       if (!live) return;
-      idle = "requestIdleCallback" in window ? window.requestIdleCallback(startLife, { timeout: 1500 }) : window.setTimeout(startLife, 300);
+      // Safari has no requestIdleCallback
+      const whenIdle = typeof window.requestIdleCallback === "function";
+      idle = whenIdle ? window.requestIdleCallback(startLife, { timeout: 1500 }) : window.setTimeout(startLife, 300);
     });
     return () => {
       live = false;
       window.clearTimeout(fallback);
-      if ("cancelIdleCallback" in window) window.cancelIdleCallback(idle);
+      if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idle);
       window.clearTimeout(idle);
     };
   }, [settled, snapshot]);
