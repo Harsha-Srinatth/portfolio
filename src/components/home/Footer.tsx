@@ -4,6 +4,7 @@ import { ArrowUp, Heart } from "lucide-react";
 import { Ground } from "./Ambient";
 import { CountUp } from "./motion";
 import { readLiked, sendLike, subscribeLiked } from "./likeStore";
+import { useStats } from "./statsStore";
 import { useInView } from "./useInView";
 
 function ordinal(n: number) {
@@ -29,18 +30,13 @@ function Burst() {
   );
 }
 
-type FooterProps = {
-  visitorCount: number | null;
-  hearts: number | null;
-  onHeartsChange: (hearts: number) => void;
-};
-
 /**
  * Applause and visitor count. Both read from and write to the existing stats
  * store (Upstash Redis in production) — nothing here is initialised locally.
  * One applause per browser, as before.
  */
-export function Footer({ visitorCount, hearts, onHeartsChange }: FooterProps) {
+export function Footer() {
+  const { visitors: visitorCount, likes: hearts } = useStats();
   // Previously applauded in this browser (read after hydration, never on the server).
   const likedBefore = useSyncExternalStore(subscribeLiked, readLiked, () => false);
   const [likedNow, setLiked] = useState(false);
@@ -54,7 +50,8 @@ export function Footer({ visitorCount, hearts, onHeartsChange }: FooterProps) {
     setPending(true);
     setFailed(false);
     try {
-      onHeartsChange(await sendLike());
+      // sendLike tells the page the new count itself (LIKES_EVENT)
+      await sendLike();
       setLiked(true);
     } catch (error) {
       console.error("[stats] Failed to record like", error);

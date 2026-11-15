@@ -42,11 +42,46 @@ export const PERSON = {
 };
 
 export const GITHUB = {
+  /** the profile the site links to */
   username: "Harsha-Srinatth",
+  /**
+   * Every account whose activity counts: personal and internship. The graph
+   * on the site adds them together, day by day, into one calendar.
+   */
+  accounts: ["Harsha-Srinatth", "Harsha-Alchemist"],
   totalContributions: 290,
   year: 2025,
   repoCount: 12,
 };
+
+export type Experience = {
+  company: string;
+  /** what the company makes, in a few words */
+  about: string;
+  /** newest first; `end` is left out for the role held now */
+  roles: { title: string; kind: string; start: string; end?: string }[];
+  points: string[];
+  /** what the work touched, taken from the points above */
+  areas: string[];
+};
+
+export const EXPERIENCE: Experience[] = [
+  {
+    company: "JobAlchemy",
+    about: "AI-powered recruitment",
+    roles: [
+      { title: "Software Engineer", kind: "Full-time", start: "2026-11-04" },
+      { title: "Software Engineer Intern", kind: "Internship", start: "2026-08-03", end: "2026-11-03" },
+    ],
+    points: [
+      "Developed frontend and backend features for Eve, an AI-powered recruitment platform, supporting candidate management, recruiter workflows, and messaging.",
+      "Implemented AI-powered candidate retrieval pipelines involving embeddings, vector search, and reranking to improve candidate matching and retrieval.",
+      "Integrated AI APIs and developed backend pipelines in Atom to support intelligent recruitment workflows and platform features.",
+      "Improved Atom's backend performance through system-level optimizations and backend enhancements.",
+    ],
+    areas: ["Eve", "Atom", "Embeddings", "Vector search", "Reranking", "AI APIs", "Backend performance"],
+  },
+];
 
 export type Achievement = {
   year: string;

@@ -159,7 +159,7 @@ export function Hero() {
     const el = section.current;
     if (!el) return;
     // wakes a little before it scrolls back into view, so it is ready on arrival
-    const io = new IntersectionObserver(([e]) => el.classList.toggle("hero-still", !e.isIntersecting), { rootMargin: "300px 0px" });
+    const io = new IntersectionObserver((entries) => el.classList.toggle("hero-still", !entries[entries.length - 1].isIntersecting), { rootMargin: "300px 0px" });
     io.observe(el);
     return () => io.disconnect();
   }, []);
