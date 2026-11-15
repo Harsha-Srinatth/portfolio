@@ -22,6 +22,7 @@ function later<P>(load: () => Promise<ComponentType<P>>) {
   return lazy(() => heroReady.then(load).then((c) => ({ default: c })));
 }
 const About = later(() => import("@/components/home/About").then((m) => m.About));
+const Experience = later(() => import("@/components/home/Experience").then((m) => m.Experience));
 const Work = later(() => import("@/components/home/Work").then((m) => m.Work));
 const Path = later(() => import("@/components/home/Path").then((m) => m.Path));
 const Skills = later(() => import("@/components/home/Skills").then((m) => m.Skills));
@@ -90,6 +91,10 @@ function Index() {
         <Hero />
         <Suspense>
           <About />
+        </Suspense>
+        <Course />
+        <Suspense>
+          <Experience />
         </Suspense>
         <Course />
         <Suspense>

@@ -6,6 +6,7 @@ import { setTheme, useTheme } from "@/lib/theme";
 /** Every section, in page order, for the phone menu. */
 const MENU = [
   { href: "#about", label: "About" },
+  { href: "#experience", label: "Experience" },
   { href: "#constellation", label: "Work" },
   { href: "#strata", label: "Path" },
   { href: "#frequencies", label: "Skills" },
@@ -16,6 +17,7 @@ const MENU = [
 
 const NAV = [
   { href: "#about", label: "About" },
+  { href: "#experience", label: "Experience" },
   { href: "#constellation", label: "Work" },
   { href: "#strata", label: "Path" },
   { href: "#transmissions", label: "Contact" },

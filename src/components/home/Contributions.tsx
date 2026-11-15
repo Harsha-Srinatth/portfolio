@@ -74,6 +74,8 @@ function snapshotCalendar() {
   return { start: iso(start), end: CONTRIBUTION_SNAPSHOT.asOf, days, total };
 }
 const SNAPSHOT = snapshotCalendar();
+/** The profiles the graph adds together, with what each is for. */
+const ACCOUNTS = CONTRIBUTION_SNAPSHOT.accounts.map((a) => ({ user: a.user, label: a.label }));
 
 /** Lay the days from `from` to `to` out in week columns, padding the first and last weeks. */
 function weeks(from: string, to: string, days: Day[] | null) {
@@ -232,10 +234,14 @@ export function Contributions() {
           <span className="grid h-11 w-11 place-items-center rounded-xl bg-secondary">
             <GithubMark className="h-5 w-5" />
           </span>
-          <p className="leading-tight" aria-live="polite">
-            <span className="font-display text-[1.75rem] font-[400] tabular-nums tracking-[-0.02em]">{shown ? <CountUp key={viewLabel(view)} value={shown.total} /> : "…"}</span>
-            <span className="ml-2 text-[0.95rem] text-muted-foreground">contributions {when}</span>
-          </p>
+          <div className="leading-tight">
+            <p aria-live="polite">
+              <span className="font-display text-[1.75rem] font-[400] tabular-nums tracking-[-0.02em]">{shown ? <CountUp key={viewLabel(view)} value={shown.total} /> : "…"}</span>
+              <span className="ml-2 text-[0.95rem] text-muted-foreground">contributions {when}</span>
+            </p>
+            {/* one graph for both accounts: say so, right under the number */}
+            <p className="mt-1 text-[0.85rem] text-foreground/75">{ACCOUNTS.map((a) => a.label).join(" + ")} accounts, combined</p>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           {views.length > 1 && (
@@ -255,12 +261,26 @@ export function Contributions() {
               ))}
             </div>
           )}
-          <a href={profile} target="_blank" rel="noreferrer" className="group inline-flex items-center gap-1.5 text-[0.9rem] text-foreground/80 hover:text-foreground">
-            <span className="link-underline">@{GITHUB.username}</span>
-            <ArrowUpRight className="h-4 w-4 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" strokeWidth={1.6} />
-          </a>
         </div>
       </div>
+
+      {/* both profiles the graph is made of */}
+      <ul className="mt-5 flex flex-wrap gap-2.5">
+        {ACCOUNTS.map((a) => (
+          <li key={a.user}>
+            <a
+              href={`https://github.com/${a.user}`}
+              target="_blank"
+              rel="noreferrer"
+              className="group inline-flex items-center gap-2 rounded-full border border-border bg-background/60 py-1.5 pl-3.5 pr-3 text-[0.88rem] transition-colors duration-300 hover:border-foreground/40"
+            >
+              <span className="text-muted-foreground">{a.label}</span>
+              <span className="text-foreground/90">@{a.user}</span>
+              <ArrowUpRight className="h-3.5 w-3.5 text-foreground/60 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" strokeWidth={1.6} />
+            </a>
+          </li>
+        ))}
+      </ul>
 
       <div ref={ref} className={`mt-7 ${grown ? "contrib-grow" : ""}`} role="img" aria-label={shown ? `${shown.total} GitHub contributions ${when}` : `GitHub contributions ${when}, loading`}>
         {/* the whole year in one row on wider screens; two half-years on phones */}
@@ -300,7 +320,6 @@ export function Contributions() {
           ) : (
             [
               fetched?.languages.length ? `Mostly ${fetched.languages.join(" and ")}${fetched.repos ? `, ${fetched.repos} public repositories` : ""}.` : "",
-              GITHUB.accounts.length > 1 ? "Personal and internship accounts combined." : "",
             ]
               .filter(Boolean)
               .join(" ") || "\u00a0"
