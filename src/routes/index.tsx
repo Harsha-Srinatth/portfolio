@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useState, type ComponentType } from "react";
+import { Suspense, lazy, useEffect, type ComponentType } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { recordVisitOnce } from "@/lib/visit";
@@ -10,6 +10,7 @@ import { useReveal } from "@/components/home/useReveal";
 import { usePointerGlow } from "@/components/home/motionEvents";
 import { Rail } from "@/components/home/Rail";
 import { LIKES_EVENT } from "@/components/home/likeStore";
+import { setStats } from "@/components/home/statsStore";
 import { Toaster } from "@/components/home/Toast";
 
 /*
@@ -51,14 +52,14 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const [visitorCount, setVisitorCount] = useState<number | null>(null);
-  const [hearts, setHearts] = useState<number | null>(null);
+  // No state here: this component must not re-render after it has mounted, or
+  // the sections still waiting to start up lose their content (statsStore.ts).
   useReveal();
   usePointerGlow();
 
   // a like sent from the hero card updates the count shown in the footer
   useEffect(() => {
-    const onLikes = (e: Event) => setHearts((e as CustomEvent<number>).detail);
+    const onLikes = (e: Event) => setStats({ likes: (e as CustomEvent<number>).detail });
     window.addEventListener(LIKES_EVENT, onLikes);
     return () => window.removeEventListener(LIKES_EVENT, onLikes);
   }, []);
@@ -69,8 +70,7 @@ function Index() {
   useEffect(() => {
     void recordVisitOnce()
       .then((stats) => {
-        setVisitorCount(stats.currentCount);
-        setHearts(stats.likes);
+        setStats({ visitors: stats.currentCount, likes: stats.likes });
       })
       .catch((error) => {
         console.error("[stats] Failed to record visit", error);
@@ -123,7 +123,7 @@ function Index() {
         <Course />
       </main>
       <Suspense>
-        <Footer visitorCount={visitorCount} hearts={hearts} onHeartsChange={setHearts} />
+        <Footer />
       </Suspense>
       <Toaster />
     </>

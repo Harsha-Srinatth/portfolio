@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowUpRight } from "lucide-react";
 
 import { CONTRIBUTION_SNAPSHOT } from "@/components/portfolio/contributionSnapshot";
 import { GITHUB } from "@/components/portfolio/data";
@@ -263,24 +262,6 @@ export function Contributions() {
           )}
         </div>
       </div>
-
-      {/* both profiles the graph is made of */}
-      <ul className="mt-5 flex flex-wrap gap-2.5">
-        {ACCOUNTS.map((a) => (
-          <li key={a.user}>
-            <a
-              href={`https://github.com/${a.user}`}
-              target="_blank"
-              rel="noreferrer"
-              className="group inline-flex items-center gap-2 rounded-full border border-border bg-background/60 py-1.5 pl-3.5 pr-3 text-[0.88rem] transition-colors duration-300 hover:border-foreground/40"
-            >
-              <span className="text-muted-foreground">{a.label}</span>
-              <span className="text-foreground/90">@{a.user}</span>
-              <ArrowUpRight className="h-3.5 w-3.5 text-foreground/60 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" strokeWidth={1.6} />
-            </a>
-          </li>
-        ))}
-      </ul>
 
       <div ref={ref} className={`mt-7 ${grown ? "contrib-grow" : ""}`} role="img" aria-label={shown ? `${shown.total} GitHub contributions ${when}` : `GitHub contributions ${when}, loading`}>
         {/* the whole year in one row on wider screens; two half-years on phones */}
